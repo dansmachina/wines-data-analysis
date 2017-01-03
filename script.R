@@ -33,6 +33,36 @@ log.m=glm(type~total_sulfur_dioxide + density + residual_sugar + alcohol +
             volatile_acidity + chlorides + free_sulfur_dioxide + sulphates + 
             citic_acid,data=df,family=binomial)
 
+summary(log.m)#AIC 451
+
+# p-value for overall test
+pchisq(432.42, 6485, lower=F)
+
+log.m2=glm(type ~ total_sulfur_dioxide + density + residual_sugar + alcohol + 
+             volatile_acidity + chlorides, data=df, family=binomial)
+summary(log.m2)# AIC 490
+
+# Comparing models
+anova(log.m2,log.m, test="Chisq")
+# p-value supports model 1, but maybe model 2 more understable?
+
 myprob=log.m$fitted
 myprob=ifelse(myprob>0.5,1,0)
 table(myprob, df$type)
+
+
+r2multv<-function(x){
+  r2s=1-1/(diag(solve(cov(x)))*diag(cov(x)))
+  r2s
+}
+
+# function myvif
+myvif<-function(x){
+  myvif=1/(1-r2multv(x))
+  myvif
+  sort(myvif, decreasing=TRUE)
+}
+
+myvif(cbind(df$total_sulfur_dioxide, df$density, df$residual_sugar, df$alcohol, 
+              df$volatile_acidity,  df$chlorides,  df$free_sulfur_dioxide,  df$sulphates, 
+              df$citic_acid))
