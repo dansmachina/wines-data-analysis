@@ -22,4 +22,15 @@ log.F=glm(type~fixed_acidity+volatile_acidity+citic_acid+residual_sugar+chloride
 log.B=glm(type~1,data=df,family=binomial)
 Step.for=step(log.B, scope=list(upper=log.F),direction="forward")
 
+log.m=glm(type~total_sulfur_dioxide+sulphates+chlorides,data=df,family=binomial)
+
+myprob=log.m$fitted
+myprob=ifelse(myprob>0.5,1,0)
+table(myprob, df$type)
+
+# Remove last variable to avoid perfect separation problem
 log.m=glm(type~total_sulfur_dioxide+sulphates,data=df,family=binomial)
+myprob=log.m$fitted
+myprob=ifelse(myprob>0.5,1,0)
+table(myprob, df$type)
+
