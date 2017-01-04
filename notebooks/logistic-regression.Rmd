@@ -161,5 +161,12 @@ plot <- ggplot(models,aes(x=x, y=y)) +  geom_line(data = spline_model, aes(x = x
 plot + labs(x="Number of variables",y="Accuracy") + 
   ggtitle("Accuracy vs. number of variables in logistic regression model") +
   theme(plot.title= element_text(hjust = 0.5))
-
 ```
+
+## TODO
+
+- Decir que podemos usar a) modelo más simple con 2 variables y 95% o b) modelo con 5 variables que tienen el mismo accuracy que el que tiene todas las variables.
+
+- Plot mostrando un grafico con las 2 variables de a) y separador por color de vino.
+
+- Analisis de los coeficientes de a). De b) no hace falta, simplemente decir que es similar.
