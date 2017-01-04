@@ -1,8 +1,9 @@
 library(readr)
 
-# Setting working directory
+# Setting working directory.
 # Javier
 setwd("/mnt/sda1/Dropbox/EIT/ida-Intelligent_Data_Analysis/elective/wines-data-analysis/src")
+
 
 white <- read_delim("../data/raw/winequality-white.csv",";", escape_double = FALSE, trim_ws = TRUE)
 white$type = 0
@@ -15,13 +16,13 @@ colnames(df) <- c("fixed_acidity", "volatile_acidity", "citic_acid", "residual_s
                      "chlorides", "free_sulfur_dioxide", "total_sulfur_dioxide", "density", 
                      "pH", "sulphates", "alcohol", "quality", "type")
 
-# Remove missing values
+# Remove missing values.
 df <- df[complete.cases(df), ]
 # Quality and type are categorical variables.
 df$quality <- as.factor(df$quality)
 df$type <- as.factor(df$type)
 
-#shuffle dataset
+# Shuffle dataset.
 df <- df[sample(nrow(df)),]
 
 # Write dataset into csv file.
