@@ -21,6 +21,9 @@ df <- df[complete.cases(df), ]
 df$quality <- as.factor(df$quality)
 df$type <- as.factor(df$type)
 
+#shuffle dataset
+df <- df[sample(nrow(df)),]
+
 # Write dataset into csv file.
-write.table(df, file="../data/processed/wines.csv")
+write.table(df, file="../data/processed/wines.csv", sep=";", col.names = TRUE, row.names = FALSE)
 
