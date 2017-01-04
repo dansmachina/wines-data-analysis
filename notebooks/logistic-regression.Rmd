@@ -1,0 +1,21 @@
+---
+title: "Logistic Regression"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Introduction
+
+```{r load}
+# Loading the dataset into a dataframe
+df <- read_delim("../data/processed/wines.csv", ";", escape_double = FALSE, trim_ws = TRUE)
+
+# Train and test dataset, split 80%.
+split = nrow(df)*0.8
+train = df[1:split,]
+test = df[split:nrow(df),]
+```
+
