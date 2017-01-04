@@ -163,15 +163,20 @@ plot + labs(x="Number of variables",y="Accuracy") +
   theme(plot.title= element_text(hjust = 0.5))
 ```
 
-```{r two_variables_plot}
-ggplot(train, aes(x=total_sulfur_dioxide, y=density))+geom_point(aes(colour=factor(type))) + scale_color_manual(values=c("red","blue"))
-```
+
 
 ## TODO
 
 - Decir que podemos usar a) modelo más simple con 2 variables y 95% o b) modelo con 5 variables que tienen el mismo accuracy que el que tiene todas las variables.
 
 - Explicar plot de dos variables.
+
+```{r two_variables_plot, fig.align="center", fig.width=6, fig.height=4, echo=FALSE}
+ggplot(train, aes(x=total_sulfur_dioxide, y=density))+geom_point(aes(colour=factor(type))) + 
+  scale_color_manual(values=c("white","red")) +
+  theme(panel.background = element_rect(fill = 'grey', colour = 'black'), plot.title= element_text(hjust = 0.5)) +
+  ggtitle("Plot total SO2 vs. density and coloured by type.")
+```
 
 - Analisis de los coeficientes de a). De b) no hace falta, simplemente decir que es similar.
 
