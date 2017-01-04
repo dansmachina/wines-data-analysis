@@ -1,6 +1,7 @@
 ---
 title: "Data Understanding and Preparation"
-output: html_document
+output:
+  pdf_document: default
 ---
 
 ```{r setup, include=FALSE}

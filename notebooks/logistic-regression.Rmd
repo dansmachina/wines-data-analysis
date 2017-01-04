@@ -1,10 +1,12 @@
 ---
 title: "Logistic Regression"
-output: html_document
+output:
+  pdf_document: default
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+library(readr)
 ```
 
 ## Introduction
