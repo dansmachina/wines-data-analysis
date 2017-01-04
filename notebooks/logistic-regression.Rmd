@@ -1,5 +1,7 @@
 ---
 title: "Logistic Regression"
+header-includes:
+  - \usepackage{bm}
 output:
   pdf_document: default
 ---
@@ -11,7 +13,19 @@ library(readr)
 
 ## Introduction
 
-```{r load}
+Oh!, a wine factory is going to receive a new pack of different wines and they do not have their type labelled (red or white). Ok, don't worry, we can go through each of the wines, look at it color, and label it. But... we would like to do this process automatically.  In the following lines, we will face a classification problem to predict if the wine is red or white, depending on its physicochemical attributes. 
+
+A classification problem relates input variables $x$ to the output variable $y$, but now $y$ can take only discrete values, instead of continuous variables as in regression. When $y$ can only take two discrete, it is called binary classification. We will denote these values as $y \in \{0, 1\}$ in the rest of the report, where $0 \equiv$ white class and $1 \equiv$ red type.
+
+
+## Loading the data
+
+The data science pipeline often* needs to split the original dataset into two smaller pieces: the train and test datasets. If we only evaluate our models in the same dataset, the results will be overestimated (aka overfitting). To provide honest assesments of the performance of the predictive models, we will need to validate the models using a test dataset, a partition that has not been used to build the models in order to avoid bias.
+
+(*) Some statistical learning models are robust enough to do not need this division. They can infer the behaviour of the whole population from a sample if some statistical hypothesis are fulfilled.
+
+
+```{r load, message=FALSE, warning=FALSE}
 # Loading the dataset into a dataframe
 df <- read_delim("../data/processed/wines.csv", ";", escape_double = FALSE, trim_ws = TRUE)
 
@@ -20,4 +34,75 @@ split = nrow(df)*0.8
 train = df[1:split,]
 test = df[split:nrow(df),]
 ```
+
+In this case, the test dataset consists of the 20% of the dataset (1300 observations). 
+
+# Logistic Regression Model
+
+The equivalent linear regression model in classification is the logistic regression model. This model needs to specify a function such that $p(y=0|\bm{\tilde{X}})$ and $p(y=1|\bm{\tilde{X}})$ are both greater than 0 and sum 1. The logistic function has such properties, definining the following model:
+
+$$ p(y|\bm{\tilde{X}},\bm{\beta}) = \frac{e^{\bm{\beta} \bm{\tilde{X}}}}{1+e^{\bm{\beta} \bm{\tilde{X}}}} $$
+
+If $\beta_i > 0$ then increasing one unit in $x_i$ will increase the probability of a success. If $\beta_i < 0$,
+then the probabilty of success decrease when increasing $x_i$. When $\beta_i = 0$ , $e^0 = 1$, so the odds do not change with $x_i$.
+
+### Full model
+We start by defining a logistic regression model with all the 11 attributes as the predictors. We do not use the `quality`, used in regression, and neither the `type`, used as the target variable:
+
+```{r full_model}
+# Logistic regression model with all the variables.
+log.full=glm(type~fixed_acidity+volatile_acidity+citic_acid+residual_sugar+chlorides
+             +free_sulfur_dioxide+total_sulfur_dioxide+density
+             +pH+sulphates+alcohol, data=train, family=binomial)
+summary(log.full)
+```
+At first sight, each of the coeffiecient has a marginal test which attempts the null hypothesis $H_0$: $\beta_i = 0$, after adjusting the coefficients within the model. That means, it is checked the net effect of each variable and whether should be in the model or not. All the $p$-values are small enough to reject $H_0$ (considering $\alpha = 0.05$) except for `citric_acid` (0.12) and `sulphates` (0.249). Let us discard these two variables in the further analysis:
+
+```{r f_model}
+# Logistic regression model with all the variables.
+log.F=glm(type~fixed_acidity+volatile_acidity+residual_sugar+chlorides
+             +free_sulfur_dioxide+total_sulfur_dioxide+density
+             +pH+alcohol, data=train, family=binomial)
+summary(log.F)
+```
+All the marginal tests are now significantly small and the overall fit of the model is high enough ($p = 1$), so we do not have evidence to reject the model in favour of the simple constant model.
+
+```{r f_model_overall}
+pchisq(log.F$deviance, log.F$df.residual, lower=F)
+```
+
+### Validation
+
+We will define the following function to validate the correctness of the model. It basically counts the number of correctly classified observations, and it is divided by the total number of examples.
+
+```{r accuracy}
+accuracy <- function(model, train, test){
+  # Train error
+  train_prob=model$fitted
+  train_prob=ifelse(train_prob>0.5,1,0)
+  d_train = table(train_prob, train$type)
+  
+  # Test error
+  test_prob = predict(model, newdata = test, type = "response")
+  test_prob = ifelse(test_prob>0.5,1,0)
+  d_test = table(test_prob, test$type)
+  
+  train_accuracy = sum(diag(d_train))/sum(d_train)
+  test_accuracy = sum(diag(d_test))/sum(d_test)
+  
+  return(list(train_accuracy, test_accuracy))
+}
+```
+
+```{r full_model_validation}
+accuracy(log.F, train, test)
+```
+Hence, with the full model we obtain an accuracy of 99% in both train and test dataset. This can be explained by the fact that the `type` of a wine is clearly defined by a combination of its chemical properties, as expected.
+
+### Simpler Model
+
+
+
+
+
 
