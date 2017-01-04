@@ -90,19 +90,60 @@ accuracy <- function(model, train, test){
   train_accuracy = sum(diag(d_train))/sum(d_train)
   test_accuracy = sum(diag(d_test))/sum(d_test)
   
-  return(list(train_accuracy, test_accuracy))
+  return(list("train" = train_accuracy, "test" = test_accuracy))
 }
 ```
 
 ```{r full_model_validation}
-accuracy(log.F, train, test)
+log.F.error = accuracy(log.F, train, test)
+log.F.error$train
+log.F.error$test
 ```
 Hence, with the full model we obtain an accuracy of 99% in both train and test dataset. This can be explained by the fact that the `type` of a wine is clearly defined by a combination of its chemical properties, as expected.
 
 ### Simpler Model
 
+Though we obtain a satisfactory accuracy using almost all the variables of the dataset, we would like to find out a simpler model, where just a few attributes were used. This would lead to a more understable model, easy to interpret and efficient. For instance, we could agree that an optimal model is the one which provides, at least, a 95% of correct classification.
+
+Let us start with the simplest model: the constant model. Since we know that the classes are a bit unbalanced, let us start with the model which sets all the labels to 1.
+
+```{r constant}
+log.B=glm(type~1, data=train, family=binomial)
+accuracy(log.B, train, test)
+```
+
+A bit more than 75% of accuracy just by guessing that all the wines will be red. However, we are not using the chemical information. Let us now include one of the variables to the logistic model. Which one? The one which decreases the most the AIC. The AIC is a measure of the quality of different models, relative to each of the other models. Ideal for model selection.
+
+The function `step` does this task for us: it chooses a model by AIC in a stepwise algorithm. We would use it in the forward direction: tt starts by the simplest constant model, and it tries to achieve the best model up to the full model, previously defined. Since we will go step by step, we will set the number of `steps` manually, to see what happens in each level.
+
+```{r stepwise_1, warning=FALSE}
+#Stepwise algorithm
+step(log.B, scope=list(upper=log.F), direction="forward", step=1)
+```
+
+Looking at the output, we observe that the best attribute to build a logistic regression with just a single variable is the `total_sulfur_dioxide`. The accuracy of the logistic regression variable for both train and test datasets is 92%! So finally, type is almost a matter of sulfur in the liquid. This is, nevertheless, not a surprise, since the most correlated variable with respect to the `type` is also this one:
 
 
+```{r corr}
+log.1=glm(type~total_sulfur_dioxide, data=train, family=binomial)
+accuracy(log.1, train, test)
+cor(df, df$type)
+```
+
+Let us include one more variable and see what happens:
+```{r stepwise_2, warning=FALSE}
+#Stepwise algorithm
+step(log.1, scope=list(upper=log.F), direction="forward", step=1)
+```
 
 
+The AIC decays the most with the inclution of `density`, reching an accuracy of 95%. Using just two variables of the dataset, we are just wrong in 58 classifications (21 should have been red, and 37 white) up to a total of 1300 observations.
+
+
+```{r density}
+log.2=glm(type~total_sulfur_dioxide+density, data=train, family=binomial)
+accuracy(log.2, train, test)
+```
+
+We stop here, since the addition of more variables does not significantly increase the accuracy of the model. The following plot summarises the accuracy of the logistic model with respect the number of variables included in the model, following the stepwise algorithm.
 
