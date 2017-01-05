@@ -1,9 +1,18 @@
 ---
 title: "Logistic Regression"
+author: "José Contreras Santos, Javier González Ferrer, Alejandro González Pérez"
 header-includes:
   - \usepackage{bm}
 output:
-  pdf_document: default
+  pdf_document: 
+    citation_package: natbib
+    keep_tex: true
+    fig_caption: true
+abstract: A logistic regression project to determine the type of wine depending on its physicochemical attributes.
+keywords: "pandoc, r markdown, knitr"
+date: "`r format(Sys.time(), '%B, %Y')`"
+geometry: margin=1in
+fontsize: 12pt
 ---
 
 ```{r setup, include=FALSE}
@@ -12,23 +21,26 @@ library(readr)
 library(ggplot2)
 ```
 
-## Introduction
+# Introduction
 
 Oh!, a wine factory is going to receive a new pack of different wines and they do not have their type labelled (red or white). Ok, don't worry, we can go through each of the wines, look at it color, and label it. But... we would like to do this process automatically.  In the following lines, we will face a classification problem to predict if the wine is red or white, depending on its physicochemical attributes. 
 
 A classification problem relates input variables $x$ to the output variable $y$, but now $y$ can take only discrete values, instead of continuous variables as in regression. When $y$ can only take two discrete, it is called binary classification. We will denote these values as $y \in \{0, 1\}$ in the rest of the report, where $0 \equiv$ white class and $1 \equiv$ red type.
 
 
-## Loading the data
+# Loading the data
 
-The data science pipeline often* needs to split the original dataset into two smaller pieces: the train and test datasets. If we only evaluate our models in the same dataset, the results will be overestimated (aka overfitting). To provide honest assesments of the performance of the predictive models, we will need to validate the models using a test dataset, a partition that has not been used to build the models in order to avoid bias.
+The data science pipeline often[^1] needs to split the original dataset into two smaller pieces: the train and test datasets. If we only evaluate our models in the same dataset, the results will be overestimated (aka overfitting). To provide honest assesments of the performance of the predictive models, we will need to validate the models using a test dataset, a partition that has not been used to build the models in order to avoid bias.
 
-(*) Some statistical learning models are robust enough to do not need this division. They can infer the behaviour of the whole population from a sample if some statistical hypothesis are fulfilled.
+[^1]: Some statistical learning models are robust enough to do not need this division. They can infer the behaviour of the whole population from a sample if some statistical hypothesis are fulfilled.
 
 
 ```{r load, message=FALSE, warning=FALSE}
 # Loading the dataset into a dataframe
-df <- read_delim("../data/processed/wines.csv", ";", escape_double = FALSE, trim_ws = TRUE)
+df <- read_delim("../data/processed/wines.csv", 
+  ";", 
+  escape_double = FALSE, 
+  trim_ws = TRUE)
 
 # Train and test dataset, split 80%.
 split = nrow(df)*0.8
@@ -47,12 +59,13 @@ $$ p(y|\bm{\tilde{X}},\bm{\beta}) = \frac{e^{\bm{\beta} \bm{\tilde{X}}}}{1+e^{\b
 If $\beta_i > 0$ then increasing one unit in $x_i$ will increase the probability of a success. If $\beta_i < 0$,
 then the probabilty of success decrease when increasing $x_i$. When $\beta_i = 0$ , $e^0 = 1$, so the odds do not change with $x_i$.
 
-### Full model
+## Full model
 We start by defining a logistic regression model with all the 11 attributes as the predictors. We do not use the `quality`, used in regression, and neither the `type`, used as the target variable:
 
 ```{r full_model}
 # Logistic regression model with all the variables.
-log.full=glm(type~fixed_acidity+volatile_acidity+citic_acid+residual_sugar+chlorides
+log.full=glm(type~fixed_acidity+volatile_acidity
+             +citic_acid+residual_sugar+chlorides
              +free_sulfur_dioxide+total_sulfur_dioxide+density
              +pH+sulphates+alcohol, data=train, family=binomial)
 summary(log.full)
@@ -61,7 +74,8 @@ At first sight, each of the coeffiecient has a marginal test which attempts the 
 
 ```{r f_model}
 # Logistic regression model with all the variables.
-log.F=glm(type~fixed_acidity+volatile_acidity+residual_sugar+chlorides
+log.F=glm(type~fixed_acidity+volatile_acidity
+             +residual_sugar+chlorides
              +free_sulfur_dioxide+total_sulfur_dioxide+density
              +pH+alcohol, data=train, family=binomial)
 summary(log.F)
@@ -72,7 +86,7 @@ All the marginal tests are now significantly small and the overall fit of the mo
 pchisq(log.F$deviance, log.F$df.residual, lower=F)
 ```
 
-### Validation
+## Validation
 
 We will define the following function to validate the correctness of the model. It basically counts the number of correctly classified observations, and it is divided by the total number of examples.
 
@@ -102,7 +116,7 @@ log.F.error$test
 ```
 Hence, with the full model we obtain an accuracy of 99% in both train and test dataset. This can be explained by the fact that the `type` of a wine is clearly defined by a combination of its chemical properties, as expected.
 
-### Simpler Model
+## Simpler Model
 
 Though we obtain a satisfactory accuracy using almost all the variables of the dataset, we would like to find out a simpler model, where just a few attributes were used. This would lead to a more understable model, easy to interpret and efficient. For instance, we could agree that an optimal model is the one which provides, at least, a 95% of correct classification.
 
@@ -148,7 +162,7 @@ accuracy(log.2, train, test)
 
 We stop here, since the addition of more variables does not significantly increase the accuracy of the model. The following plot summarises the accuracy of the logistic model with respect the number of variables included in the model, following the stepwise algorithm.
 
-```{r model_comparison, fig.align="center", fig.width=6, fig.height=2.5, echo=FALSE}
+```{r model_comparison, fig.align="center", fig.width=6, fig.height=2.5, echo=FALSE, fig.cap="Accuracy vs. number of variables.", fig.retina=1}
 
 x = 0:9
 y = c(0.75, 0.92, 0.95, 0.98, 0.99, 0.997, 0.997, 0.997, 0.997, 0.997)
@@ -165,18 +179,19 @@ plot + labs(x="Number of variables",y="Accuracy") +
 
 
 
-## TODO
+# Conclussions
 
-- Decir que podemos usar a) modelo más simple con 2 variables y 95% o b) modelo con 5 variables que tienen el mismo accuracy que el que tiene todas las variables.
+After our analysis, we have seen that two different aproaches are possible in order to solve our classification problem, introduced at the begining of this document. 
+As showed above, we have studied two models: a simpler one with two variables and 95% of accuracy and a more complex one with five variables and a 99% of accuracy.
 
-- Explicar plot de dos variables.
+It is interesting to notice that the model with just two variables has an easy explanation. Let's take a look at the Figure 2.
 
-```{r two_variables_plot, fig.align="center", fig.width=6, fig.height=4, echo=FALSE}
+
+```{r two_variables_plot, fig.align="center", fig.width=6, fig.height=4, echo=FALSE, fig.cap="Total SO2 vs. density.", fig.retina=1, fig.pos="h"}
 ggplot(train, aes(x=total_sulfur_dioxide, y=density))+geom_point(aes(colour=factor(type))) + 
   scale_color_manual(values=c("white","red")) +
   theme(panel.background = element_rect(fill = 'grey', colour = 'black'), plot.title= element_text(hjust = 0.5)) +
   ggtitle("Plot total SO2 vs. density and coloured by type.")
 ```
 
-- Analisis de los coeficientes de a). De b) no hace falta, simplemente decir que es similar.
-
+This plot shows the variables density and total SO2 but colored by type. As we can see, it is clear that we have an almost perfect distinction between red and white wines. That is why we are having such a great 95% accuracy in our simpler model.
