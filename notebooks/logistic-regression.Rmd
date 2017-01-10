@@ -1,6 +1,6 @@
 ---
 title: "Logistic Regression"
-author: "José Contreras Santos, Javier González Ferrer, Alejandro González Pérez"
+author: "Jose Luis Contreras Santos, Antonio Javier González Ferrer, Alejandro González Pérez"
 header-includes:
   - \usepackage{bm}
 output:
