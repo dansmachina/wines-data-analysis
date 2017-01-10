@@ -37,7 +37,7 @@ The data science pipeline often[^1] needs to split the original dataset into two
 
 ```{r load, message=FALSE, warning=FALSE}
 # Loading the dataset into a dataframe
-df <- read_delim("../data/processed/wines.csv", 
+df <- read_delim("../../data/processed/wines.csv", 
   ";", 
   escape_double = FALSE, 
   trim_ws = TRUE)
