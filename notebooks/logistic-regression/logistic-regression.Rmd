@@ -118,7 +118,7 @@ Hence, with the full model we obtain an accuracy of 99% in both train and test d
 
 ## Simpler Model
 
-Though we obtain a satisfactory accuracy using almost all the variables of the dataset, we would like to find out a simpler model, where just a few attributes were used. This would lead to a more understable model, easy to interpret and efficient. For instance, we could agree that an optimal model is the one which provides, at least, a 95% of correct classification.
+Though we obtain a satisfactory accuracy using almost all the variables of the dataset, we would like to find out a simpler model, where just a few attributes were used. This would lead to a more understandable model, easy to interpret and efficient. For instance, we could agree that an optimal model is the one which provides, at least, a 95% of correct classification.
 
 Let us start with the simplest model: the constant model. Since we know that the classes are a bit unbalanced, let us start with the model which sets all the labels to 1.
 
@@ -151,8 +151,7 @@ Let us include one more variable and see what happens:
 step(log.1, scope=list(upper=log.F), direction="forward", step=1)
 ```
 
-
-The AIC decays the most with the inclution of `density`, reching an accuracy of 95%. Using just two variables of the dataset, we are just wrong in 58 classifications (21 should have been red, and 37 white) up to a total of 1300 observations.
+The AIC decays the most with the inclusion of `density`, reaching an accuracy of 95\%. Using just two variables of the dataset, we are just wrong in 58 classifications (21 should have been red, and 37 white) up to a total of 1300 observations.
 
 
 ```{r density}
@@ -177,14 +176,16 @@ plot + labs(x="Number of variables",y="Accuracy") +
   theme(plot.title= element_text(hjust = 0.5))
 ```
 
+We can detect in Figure \ref{figure:accuracy-model} that using just 5 variables in the logistic regression mode we achieve the same accuracy (99\%) than using all the 9 variables from the full model.
 
+# Discussion
 
-# Conclussions
+After our analysis, we have seen that two different approaches are possible in order to solve our classification problem, introduced at the beginning of this document:
 
-After our analysis, we have seen that two different aproaches are possible in order to solve our classification problem, introduced at the begining of this document. 
-As showed above, we have studied two models: a simpler one with two variables and 95% of accuracy and a more complex one with five variables and a 99% of accuracy.
+* <b>Best classification</b>: In this case, we would like to get the best accuracy as possible. We do not worry in terms of interpretation, but we are looking for the model with less number of parameters that reaches the best accuracy. The model (6) has a 99\% of success using 5 of the original variables. 
 
-It is interesting to notice that the model with just two variables has an easy explanation. Let's take a look at the Figure 2.
+*<b>Simplest explanation</b>: We are interesting in understanding the data and interpret the parameters of the classification predictors as straightforward as possible, imposing a minimum of accuracy. In our case, the model (5) reaches a 95\% accuracy using just 2 variables, which is very useful to easily describe the model. For instance, we can plot these two variables in the plane:
+	
 
 
 ```{r two_variables_plot, fig.align="center", fig.width=6, fig.height=4, echo=FALSE, fig.cap="Total SO2 vs. density.", fig.retina=1, fig.pos="h"}
@@ -194,4 +195,4 @@ ggplot(train, aes(x=total_sulfur_dioxide, y=density))+geom_point(aes(colour=fact
   ggtitle("Plot total SO2 vs. density and coloured by type.")
 ```
 
-This plot shows the variables density and total SO2 but colored by type. As we can see, it is clear that we have an almost perfect distinction between red and white wines. That is why we are having such a great 95% accuracy in our simpler model.
+This plot shows the variables `density` and `total_sulphur_dioxide` but colored by type. As we can see, it is clear that we have an almost perfect clusters between red and white wines. That is why we are having such a great 95\% accuracy in our simpler model. 
