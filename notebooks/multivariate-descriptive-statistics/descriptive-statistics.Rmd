@@ -5,8 +5,12 @@ output: html_notebook
 
 Cosas que se pueden incluir en esta sección:
 
+* Quizas una tabla explicando los atributos cuantitativos, destacando el min, max, mean y standard deviation (ver imagen summary.png). La funcion summary() creo que te da estos valores.
+
+* Histograma de quality (hist(df$quality)) separados por rojo y blanco. Comentar por encima. (Ver imagen histogram.png)
+
 * Análisis de `correlations` (function corrplot.mixed with first argument r) y `partial correlations` (function corrplot.mixed with first argument partial.corr). 
 
-* Para las variables numéritcas (no categóricas):s Interesante también calcular los `coefficients of determination` de cada variable (function r2multv) y la `effective dependence coefficient of the R matrix` (function 1-det(cor(ds[,c(1,5,7,8,9,10)]))^(1/6)) El 6 de 1/6 es el número de atributos. 
+* Para las variables numéricas (no categóricas):s Interesante también calcular los `coefficients of determination` de cada variable (function r2multv) y la `effective dependence coefficient of the R matrix` (function 1-det(cor(ds[,c(1,5,7,8,9,10)]))^(1/6)) El 6 de 1/6 es el número de atributos. 
 
 
