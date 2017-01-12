@@ -1,0 +1,133 @@
+---
+title: "Linear Regression"
+author: "Jose Luis Contreras Santos, Antonio Javier González Ferrer, Alejandro González Pérez"
+header-includes:
+  - \usepackage{bm}
+output:
+  pdf_document: 
+    citation_package: natbib
+    keep_tex: true
+    fig_caption: true
+abstract: An attempt to use linear regression to predict wine quality.
+keywords: "pandoc, r markdown, knitr"
+date: "`r format(Sys.time(), '%B, %Y')`"
+geometry: margin=1in
+fontsize: 12pt
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(readr)
+library(dplyr)
+library(tseries)
+library(lmtest)
+
+# Setting working directory
+# Jose
+setwd("/home/jose/repos/wines-data-analysis/src")
+
+df <- read_delim("../data/processed/wines.csv", ";", escape_double = FALSE, trim_ws = TRUE)
+
+# Type is a categorical variables.
+df$type <- as.factor(df$type)
+```
+
+# Introduction
+
+The aim of this section is to use linear regression to try and predict a wine's quality based on its chemical attributes. To do this, we will consider quality as a continuous variable ranging from 0 to 10. It is worth noting, however, that this variable is in fact a categorical one which can only take one of the 11 integer values comprised between 0 and 10. Therefore, as predictions will be continuous, many of them will most likely be slightly off due to this discrepancy. This should not pose a problem, however, as the usual error metrics, such as RMSE, can be obtained anyways.
+
+# Model fitting
+
+After splitting the data in training and test sets, the training set was used to fit a linear regression model. At first, all variables were used as explanatory variables for the model. 
+
+```{r first_model, message=FALSE, warning=FALSE}
+# Train and test dataset, split 80% (data has been shuffled previously, no need to sample randomly)
+split = nrow(df)*0.8
+train = df[1:split,]
+test = df[split:nrow(df),]
+
+# Fit the model using all variables
+model1 = lm(quality~fixed_acidity+volatile_acidity+citic_acid
+            +residual_sugar+chlorides+free_sulfur_dioxide
+            +total_sulfur_dioxide+density+pH+sulphates+alcohol, data=train)
+summary(model1)
+```
+
+However, as the summary above indicates, the p-values for citic acid and chlorides are not low enough to reject the null hypothesis. Thus, we can consider that the contribution of these to the variance of quality is not significantly greater than 0, and so they have been removed from the final model. The resulting linear regression model is described below.
+
+```{r refine_model, message=FALSE, warning=FALSE}
+# Citic_acid removed from the model
+model1 = update(model1, ~.-citic_acid)
+# Check if chlorides can also be removed
+summary(model1)
+
+# It can indeed be removed, do it
+model1 = update(model1, ~.-chlorides)
+summary(model1)
+```
+
+According to the obtained model, the two variables with the highest influence on quality are volatile acidity and density, specially the latter. This can be misleading however, as it represents the variation in quality per unit of the input, and the scales of the input variables differ in their order of magnitude. Checking the distribution of $density$, for example, the difference between the maximum and minimun values is lower than 0.03, whereas $total_sulfur_dioxide$ has a range of over 400. In any case, some conclusions can be extracted from this output. For example, denser wines tend to have a higher perceived quality, and the same happens to those with higher alcohol contents.
+
+The adjusted R-squared coefficient of the resulting model is rather low, with a value of only 0.29. Its associated p-value, however, is low enough for us to be confident that there exists a relationship between at least part of the input and the output variable, $quality$.
+
+# Assessing the model: assumptions 
+
+Let us further examine the quality of the linear regression model by checking if the assumptions are met. In particular, we are interested in testing if the residuals are independent, normal and have constant variance.
+
+```{r assumptions, message=FALSE, warning=FALSE}
+# A: Check the assumptions
+# Test normality
+jarque.bera.test(residuals(model1)) # Answer: No normality
+
+# Equal variances
+bptest(model1) # No constant variance
+
+# Testing independence of the residuals
+Box.test(residuals(model1)) # Independent
+```
+
+The conducted tests have different results. On the one hand, the Box-Pierce test returns a high p-value, sign that there is not enough evidence to reject the null hypothesis of independence. The results for the Jarque-Bera and Breusch-Pagan tests, on the other hand, are not so positive. According to their results, residuals are neither normal nor homoscedastic.
+
+```{r residualplot, fig.align="center", fig.width=6, fig.height=5, echo=FALSE, fig.cap="Residual plot", fig.retina=1}
+# Residuals
+par(mfrow=c(2,2))
+plot(model1, which=c(1:4), ask=F)
+```
+
+Although the residual plots are unusual due to the clustering around the integer values, they confirm the previous results. The Normal Q-Q plot is in line with the results of the Jarque-Bera test, showing departures from normality, specially in the first quartiles. From the Cook's distance plot, a significant outlier can be seen, corresponding to observation 4446.
+
+# Evaluation of results
+
+```{r evaluation, message=FALSE, warning=FALSE}
+# Residuals
+par(mfrow=c(2,2))
+plot(model1, which=c(1:4), ask=F)
+
+# Un ojo a ese outlier gigante
+
+# Conclusiones: en cuanto a hipotesis nuestro modelo es bastante mierda. Ademas parece que esta bien
+# para qualitys entre 4 y 6 mas o menos, los valores mas grandes van mal. Esto es normal porque la
+# muestra que tenemos es bastante mala (hacer histograma)
+
+# 2. Assess the model. B: Evaluate performance
+predicted <- predict(model1, test)
+
+# Percentage of correct predictions aka accuracy (we are rounding the predicted variable)
+# Around 50% are correct - not bad
+sum(test$quality == round(predicted))/nrow(test)
+
+# But the above is a simplification, we are treating quality as a continuous var, so lets check
+# more conventional metrics, in this case rmse
+rmse <- (sqrt(mean(test$quality - predicted)^2))
+rmse
+
+# Pseudo rmse (after discretizing the output var by rounding)
+# Aumenta bastante, pero ahora - yo diria - es una cifra mas indicativa
+rmse.discret <- (sqrt(mean((test$quality - round(predicted))^2)))
+rmse.discret
+
+# Conclusiones: No funciona mal en cuanto a resultados, pero no nos fiamos, entre que los
+# datos son malillos (en cuanto a distribucion) y que no hemos usado la tecnica adecuada (ver abajo)
+# En cualquier caso, posiblemente seria mejor usar Logistic Regression (o algun metodo de clasificacion)
+# para predecir la quality, que realmente no es continua.
+```

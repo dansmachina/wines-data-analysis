@@ -31,6 +31,9 @@ summary(model1)
 model1 = update(model1, ~.-chlorides)
 summary(model1)
 
+# "... but the p-value of R2 is still <0.05 so we are at least 95% confident that a relationship 
+# does exist between at least some of the input variables and the quality ranking."
+
 # 2. Assess the model. A: Check the assumptions
 
 jarque.bera.test(residuals(model1))
