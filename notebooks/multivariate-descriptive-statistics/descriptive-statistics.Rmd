@@ -1,16 +1,79 @@
 ---
 title: "Multivariate Descriptive Statistics"
-output: html_notebook
+output:
+  pdf_document: default
+  html_notebook: default
 ---
 
-Cosas que se pueden incluir en esta sección:
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(readr)
+library(ggplot2)
+```
 
-* Quizas una tabla explicando los atributos cuantitativos, destacando el min, max, mean y standard deviation (ver imagen summary.png). La funcion summary() creo que te da estos valores.
+```{r load, message=FALSE, warning=FALSE}
+# Loading the dataset into a dataframe
+df <- read_delim("../../data/processed/wines.csv", 
+  ";", 
+  escape_double = FALSE, 
+  trim_ws = TRUE)
+```
 
-* Histograma de quality (hist(df$quality)) separados por rojo y blanco. Comentar por encima. (Ver imagen histogram.png)
+# Analysis of the dataset
+## Quantitative attributes
 
-* Análisis de `correlations` (function corrplot.mixed with first argument r) y `partial correlations` (function corrplot.mixed with first argument partial.corr). 
+```{r echo=FALSE}
+summary(df)
+```
 
-* Para las variables numéricas (no categóricas):s Interesante también calcular los `coefficients of determination` de cada variable (function r2multv) y la `effective dependence coefficient of the R matrix` (function 1-det(cor(ds[,c(1,5,7,8,9,10)]))^(1/6)) El 6 de 1/6 es el número de atributos. 
+\begin{table}[]
+\centering
+\caption{Analysis of the attributes.}
+\label{my-label}
+\begin{tabular}{|l|c|c|c|c|}
+\hline
+                       & \textbf{min} & \textbf{max} & \textbf{mean} & \textbf{SD} \\ \hline
+fixed\_acidity         & 3,800        & 15,900       & 7,215         & 1.296588    \\ \hline
+volatile\_acidity      & 0,0800       & 1,5800       & 0,3396        & 0.164583    \\ \hline
+citric\_acid           & 0,0          & 1,6600       & 0,3187        & 0.1452326   \\ \hline
+residual\_sugar        & 0,600        & 65,800       & 5,444         & 4.758494    \\ \hline
+chlorides              & 0,00900      & 0,61100      & 0,05602       & 0.03503299  \\ \hline
+free\_sulfur\_dioxide  & 1,00         & 289,00       & 30,52         & 17.74849    \\ \hline
+total\_sulfur\_dioxide & 6,0          & 440,0        & 115,8         & 56.52657    \\ \hline
+density                & 0,9871       & 1,0390       & 0,9947        & 0.002999095 \\ \hline
+pH                     & 2,720        & 4,010        & 3,219         & 0.1608116   \\ \hline
+sulphates              & 0,2200       & 2,00         & 0,5313        & 0.148822    \\ \hline
+alcohol                & 8,00         & 14,90        & 10,49         & 1.192768    \\ \hline
+\end{tabular}
+\end{table}
+
+
+## Quality histogram
+
+```{r echo=FALSE}
+type.0 = subset(df, type==0)
+type.1 = subset(df, type==1)
+type.0$type <- 'white'
+type.1$type <- 'red'
+types <- rbind(type.0, type.1)
+ggplot(types, aes(types$quality, fill = type)) + geom_histogram(alpha = 0.5)+ ggtitle('Histogram of wines quality: red vs. white')+ylab("Wine samples")+xlab("Quality")
+#hist(type.0$quality, main="White wine vs. Red wine quality", xlab="Quality", ylab="Wine samples")
+#hist(type.1$quality, col="red")
+#box()
+
+```
+
+## Correlation analysis
+Análisis de `correlations` (function corrplot.mixed with first argument r) y `partial correlations` (function corrplot.mixed with first argument partial.corr).
+```{r echo=FALSE}
+
+```
+
+## Coefficients of determination
+Para las variables numéricas (no categóricas):s Interesante también calcular los `coefficients of determination` de cada variable (function r2multv) y la `effective dependence coefficient of the R matrix` (function 1-det(cor(ds[,c(1,5,7,8,9,10)]))^(1/6)) El 6 de 1/6 es el número de atributos. 
+```{r echo=FALSE}
+
+```
+
 
 
