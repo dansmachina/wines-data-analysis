@@ -9,6 +9,15 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 library(readr)
 library(ggplot2)
+library(corrplot)
+library(ppcor)
+library(RColorBrewer)
+library(mvoutlier)
+
+r2multv<-function(x){
+r2s=1-1/(diag(solve(cov(x)))*diag(cov(x)))
+r2s
+}
 ```
 
 ```{r load, message=FALSE, warning=FALSE}
@@ -64,15 +73,24 @@ ggplot(types, aes(types$quality, fill = type)) + geom_histogram(alpha = 0.5)+ gg
 ```
 
 ## Correlation analysis
-Análisis de `correlations` (function corrplot.mixed with first argument r) y `partial correlations` (function corrplot.mixed with first argument partial.corr).
 ```{r echo=FALSE}
+r<-pcor(df[,c(1,2,3,4,5,6,7,8,9,10,11)])
+partial.corr <- pcor(df[,c(1,2,3,4,5,6,7,8,9,10,11)])$estimate
 
+corrplot.mixed(r, col=brewer.pal(n=8, name="PuOr"),
+               tl.col="black", title = "Pairwise correlation", 
+               mar=c(2,0,2,0))
+
+corrplot.mixed(partial.corr, col=brewer.pal(n=8, name="PuOr"),
+               tl.col="black", title = "Partial correlations", 
+               mar=c(2,0,2,0))
 ```
 
-## Coefficients of determination
-Para las variables numéricas (no categóricas):s Interesante también calcular los `coefficients of determination` de cada variable (function r2multv) y la `effective dependence coefficient of the R matrix` (function 1-det(cor(ds[,c(1,5,7,8,9,10)]))^(1/6)) El 6 de 1/6 es el número de atributos. 
+## Coefficients of determination and effective dependence coefficient of the R matrix
 ```{r echo=FALSE}
+r2multv(df[,c(1,2,3,4,5,6,7,8,9,10,11)])
 
+1-det(cor(df[,c(1,2,3,4,5,6,7,8,9,10,11)]))^(1/11)
 ```
 
 
