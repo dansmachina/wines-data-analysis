@@ -1,16 +1,141 @@
 ---
 title: "Multivariate Descriptive Statistics"
-output: html_notebook
+output:
+  pdf_document: default
+  html_notebook: default
+header-includes:
+ - \usepackage{booktabs}
+ - \usepackage{graphicx}
+  
 ---
 
-Cosas que se pueden incluir en esta sección:
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(readr)
+library(ggplot2)
+library(corrplot)
+library(ppcor)
+library(RColorBrewer)
+library(mvoutlier)
 
-* Quizas una tabla explicando los atributos cuantitativos, destacando el min, max, mean y standard deviation (ver imagen summary.png). La funcion summary() creo que te da estos valores.
+r2multv<-function(x){
+r2s=1-1/(diag(solve(cov(x)))*diag(cov(x)))
+r2s
+}
+```
 
-* Histograma de quality (hist(df$quality)) separados por rojo y blanco. Comentar por encima. (Ver imagen histogram.png)
+```{r load, message=FALSE, warning=FALSE, echo=FALSE}
+# Loading the dataset into a dataframe
+df <- read_delim("../../data/processed/wines.csv", 
+  ";", 
+  escape_double = FALSE, 
+  trim_ws = TRUE)
+```
 
-* Análisis de `correlations` (function corrplot.mixed with first argument r) y `partial correlations` (function corrplot.mixed with first argument partial.corr). 
+# Analysis of the dataset
 
-* Para las variables numéricas (no categóricas):s Interesante también calcular los `coefficients of determination` de cada variable (function r2multv) y la `effective dependence coefficient of the R matrix` (function 1-det(cor(ds[,c(1,5,7,8,9,10)]))^(1/6)) El 6 de 1/6 es el número de atributos. 
+The dataset to analyze is composed of the red and white variants of the Portuguese "Vinho verde" wine. In total, there are 6495 different instances of wines, where 4898 are white wine and 1597 red wine. On the other hand, the dataset has 12 variables based on physicochemical tests on different wines plus two categorical variables, one for grading the wine quality by experts between 0 (very bad) and 10 (very excellent) and another binary variable, 0 = white wine and 1 = red wine.
+
+The following Table \ref{table:variables} summarizes the distribution of the quantitatives variables, highlighting their minimum, maximum, mean and standard deviation values.
+
+
+```{r echo=FALSE, include=FALSE}
+summary(df)
+```
+
+
+\begin{table}[h]
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{@{}|l|c|c|c|c|@{}}
+\toprule
+ & \textbf{min} & \textbf{max} & \textbf{mean} & \textbf{SD} \\ \midrule
+\textbf{fixed\_acidity} & 3,800 & 15,900 & 7,215 & 1.296588 \\ \midrule
+\textbf{volatile\_acidity} & 0,0800 & 1,5800 & 0,3396 & 0.164583 \\ \midrule
+\textbf{citric\_acid} & 0,0 & 1,6600 & 0,3187 & 0.1452326 \\ \midrule
+\textbf{residual\_sugar} & 0,600 & 65,800 & 5,444 & 4.758494 \\ \midrule
+\textbf{chlorides} & 0,00900 & 0,61100 & 0,05602 & 0.03503299 \\ \midrule
+\textbf{free\_sulfur\_dioxide} & 1,00 & 289,00 & 30,52 & 17.74849 \\ \midrule
+\textbf{total\_sulfur\_dioxide} & 6,0 & 440,0 & 115,8 & 56.52657 \\ \midrule
+\textbf{density} & 0,9871 & 1,0390 & 0,9947 & 0.002999095 \\ \midrule
+\textbf{pH} & 2,720 & 4,010 & 3,219 & 0.1608116 \\ \midrule
+\textbf{sulphates} & 0,2200 & 2,00 & 0,5313 & 0.148822 \\ \midrule
+\textbf{alcohol} & 8,00 & 14,90 & 10,49 & 1.192768 \\ \bottomrule
+\end{tabular}%
+}
+\caption{Summary distribution of the quantitatives variables.}
+\label{table:variables}
+\end{table}
+
+
+## Quality histogram
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+type.0 = subset(df, type==0)
+type.1 = subset(df, type==1)
+type.0$type <- 'white'
+type.1$type <- 'red'
+types <- rbind(type.0, type.1)
+ggplot(types, aes(types$quality, fill = type)) + geom_histogram(alpha = 0.5)+ ggtitle('Histogram of wines quality: red vs. white')+ylab("Wine samples")+xlab("Quality")
+#hist(type.0$quality, main="White wine vs. Red wine quality", xlab="Quality", ylab="Wine samples")
+#hist(type.1$quality, col="red")
+#box()
+
+```
+
+## Correlation analysis
+
+Let's now study the linear relationships between wine quantitative variables. The variables to be inspected are fixed_acidity, volatile_acidity, citic_acid, residual_sugar, chlorides, free_sulfur_dioxide, total_sulfur_dioxide, density, pH, sulphates and alcohol. 
+\newline
+
+```{r echo=FALSE}
+r<-cor(df[,c(1,2,3,4,5,6,7,8,9,10,11)])
+partial.corr <- pcor(df[,c(1,2,3,4,5,6,7,8,9,10,11)])$estimate
+
+corrplot.mixed(r, col=brewer.pal(n=8, name="PuOr"),
+               tl.col="black", title = "Pairwise correlation", 
+               mar=c(2,0,2,0))
+```
+\newline
+As we can see, the linear relations between variables are weak. We can only assure that free_sulfur_dioxide obviously relates with the total_sulfur_dioxide. Also the residual sugar has effects on the density of the wines. To conclude, it is interesting to mention that the residual_sugar does not linearly relate with any of the other variables. Let's confirm our hypothesis using now the matrix of partial correlations:
+
+```{r echo=FALSE}
+corrplot.mixed(partial.corr, col=brewer.pal(n=8, name="PuOr"),
+               tl.col="black", title = "Partial correlations", 
+               mar=c(2,0,2,0))
+```
+\newline
+Partial correlations, again, shows weak linear dependence between the variables. But fixed_acidity and density, residual_sugar and density are indeed strongly correlated as we can see in the values. 
+
+## Coefficients of determination
+The coefficients of determination can also give us a good insight into linear relationships within the data. 
+\newline
+```{r echo=FALSE, include=FALSE}
+r2multv(df[,c(1,2,3,4,5,6,7,8,9,10,11)])
+```
+
+\begin{table}[h]
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{@{}lccccccccccc@{}}
+\toprule
+ & \textbf{fixed\_acidity} & \textbf{volatile\_acidity} & \textbf{citic\_acid} & \textbf{residual\_sugar} & \textbf{chlorides} & \textbf{free\_sulfur\_dioxide} & \textbf{total\_sulfur\_dioxide} & \textbf{density} & \textbf{pH} & \textbf{sulphates} & \textbf{alcohol} \\ \midrule
+\textbf{R-squared} & 0.7957831 & 0.4866891 & 0.3776351 & 0.8616690 & 0.3870994 & 0.5324288 & 0.6598145 & 0.9371628 & 0.6058479 & 0.3513432 & 0.7908480 \\ \bottomrule
+\end{tabular}%
+}
+\caption{Coefficient of determination for each of the analyzed variables.}
+\label{my-label}
+\end{table}
+
+As the Table below displays, important linear relations are present in this set. Specifically, fixed_acidity, alcohol, density and residual_sugar are the most linearly explained by the other variables.
+
+
+## Effective dependence coefficient of the R matrix
+```{r echo=FALSE, include=FALSE}
+1-det(cor(df[,c(1,2,3,4,5,6,7,8,9,10,11)]))^(1/11)
+```
+Until this point, our analysis shows weak linear relations in this dataset. Further proof of this fact can be found in the effective dependence coefficient of the R matrix: D(R) = 0.4052199. This means that, altogether, linear dependences explain only 40% of the variability of the data.
+
+
 
 

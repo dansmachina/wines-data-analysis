@@ -1,10 +1,15 @@
-\BOOKMARK [1][-]{section.1}{Logistic Regression}{}% 1
-\BOOKMARK [2][-]{subsection.1.1}{Introduction}{section.1}% 2
-\BOOKMARK [2][-]{subsection.1.2}{Training and test dataset}{section.1}% 3
-\BOOKMARK [2][-]{subsection.1.3}{Models}{section.1}% 4
-\BOOKMARK [3][-]{subsubsection.1.3.1}{Full model}{subsection.1.3}% 5
-\BOOKMARK [3][-]{subsubsection.1.3.2}{Simpler models}{subsection.1.3}% 6
-\BOOKMARK [4][-]{paragraph.1.3.2.1}{Constant model}{subsubsection.1.3.2}% 7
-\BOOKMARK [4][-]{paragraph.1.3.2.2}{Two variables model \(95\045 accuracy\)}{subsubsection.1.3.2}% 8
-\BOOKMARK [4][-]{paragraph.1.3.2.3}{Five variables model \(99\045 accuracy\)}{subsubsection.1.3.2}% 9
-\BOOKMARK [2][-]{subsection.1.4}{Discussion}{section.1}% 10
+\BOOKMARK [1][-]{section.1}{Analysis of the dataset}{}% 1
+\BOOKMARK [1][-]{section.2}{Regression}{}% 2
+\BOOKMARK [2][-]{subsection.2.1}{Introduction}{section.2}% 3
+\BOOKMARK [2][-]{subsection.2.2}{Training and test dataset}{section.2}% 4
+\BOOKMARK [2][-]{subsection.2.3}{Model fitting}{section.2}% 5
+\BOOKMARK [2][-]{subsection.2.4}{Assessing the model: assumptions}{section.2}% 6
+\BOOKMARK [1][-]{section.3}{Logistic Regression}{}% 7
+\BOOKMARK [2][-]{subsection.3.1}{Introduction}{section.3}% 8
+\BOOKMARK [2][-]{subsection.3.2}{Models}{section.3}% 9
+\BOOKMARK [3][-]{subsubsection.3.2.1}{Full model}{subsection.3.2}% 10
+\BOOKMARK [3][-]{subsubsection.3.2.2}{Simpler models}{subsection.3.2}% 11
+\BOOKMARK [4][-]{paragraph.3.2.2.1}{Constant model}{subsubsection.3.2.2}% 12
+\BOOKMARK [4][-]{paragraph.3.2.2.2}{Two variables model \(95\045 accuracy\)}{subsubsection.3.2.2}% 13
+\BOOKMARK [4][-]{paragraph.3.2.2.3}{Five variables model \(99\045 accuracy\)}{subsubsection.3.2.2}% 14
+\BOOKMARK [2][-]{subsection.3.3}{Discussion}{section.3}% 15
