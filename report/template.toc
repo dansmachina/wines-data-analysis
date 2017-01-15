@@ -1,10 +1,14 @@
-\contentsline {section}{\numberline {1}Logistic Regression}{1}{section.1}
+\contentsline {section}{\numberline {1}Regression}{1}{section.1}
 \contentsline {subsection}{\numberline {1.1}Introduction}{1}{subsection.1.1}
 \contentsline {subsection}{\numberline {1.2}Training and test dataset}{1}{subsection.1.2}
-\contentsline {subsection}{\numberline {1.3}Models}{1}{subsection.1.3}
-\contentsline {subsubsection}{\numberline {1.3.1}Full model}{2}{subsubsection.1.3.1}
-\contentsline {subsubsection}{\numberline {1.3.2}Simpler models}{2}{subsubsection.1.3.2}
-\contentsline {paragraph}{\numberline {1.3.2.1}Constant model}{2}{paragraph.1.3.2.1}
-\contentsline {paragraph}{\numberline {1.3.2.2}Two variables model (95\% accuracy)}{3}{paragraph.1.3.2.2}
-\contentsline {paragraph}{\numberline {1.3.2.3}Five variables model (99\% accuracy)}{4}{paragraph.1.3.2.3}
-\contentsline {subsection}{\numberline {1.4}Discussion}{4}{subsection.1.4}
+\contentsline {subsection}{\numberline {1.3}Model fitting}{1}{subsection.1.3}
+\contentsline {subsection}{\numberline {1.4}Assessing the model: assumptions}{2}{subsection.1.4}
+\contentsline {section}{\numberline {2}Logistic Regression}{3}{section.2}
+\contentsline {subsection}{\numberline {2.1}Introduction}{3}{subsection.2.1}
+\contentsline {subsection}{\numberline {2.2}Models}{3}{subsection.2.2}
+\contentsline {subsubsection}{\numberline {2.2.1}Full model}{4}{subsubsection.2.2.1}
+\contentsline {subsubsection}{\numberline {2.2.2}Simpler models}{4}{subsubsection.2.2.2}
+\contentsline {paragraph}{\numberline {2.2.2.1}Constant model}{4}{paragraph.2.2.2.1}
+\contentsline {paragraph}{\numberline {2.2.2.2}Two variables model (95\% accuracy)}{5}{paragraph.2.2.2.2}
+\contentsline {paragraph}{\numberline {2.2.2.3}Five variables model (99\% accuracy)}{6}{paragraph.2.2.2.3}
+\contentsline {subsection}{\numberline {2.3}Discussion}{6}{subsection.2.3}

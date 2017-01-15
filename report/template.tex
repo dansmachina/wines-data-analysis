@@ -36,7 +36,65 @@
 
 
 
-%%%% body goes in here %%%%
+\section{Regression}
+
+\subsection{Introduction}
+\paragraph*{}
+The aim of this section is to use linear regression to model and predict a wine's quality based on its physicochemical attributes. To do this, we will consider the variable `quality` as a continuous variable ranging from 0 to 10. It is worth noting, however, that this variable is originally a categorical one which can only take one of the 11 integer values comprised between 0 and 10. Therefore, as predictions will be continuous, many of them will most likely be slightly off due to this discrepancy. This should not pose a problem,  as the usual error metrics, such as RMSE, can be obtained anyways.
+
+\subsection{Training and test dataset}
+
+\paragraph*{}
+The data science pipeline often\footnote{Some statistical learning models are robust enough to do not need this division. They can infer the behavior of the whole population from a sample if some statistical hypothesis are fulfilled.} needs to split the original dataset into two smaller pieces: the train and test datasets. If we only evaluate our models in the same dataset, the results will be overestimated (aka overfitting). To provide honest assessments of the performance of the predictive models, we will need to validate the models using a test dataset, a partition that has not been used to build the models in order to avoid bias. 
+
+\paragraph*{}
+In this case, the test dataset consists of the 20\% of the original data (1300 observations) and the training dataset is composed of 5196 data points.
+
+\subsection{Model fitting}
+After splitting the data in training and test sets, the training set was used to fit a linear regression model. At first, all variables were used as explanatory variables for the model:
+
+\begin{equation*}
+\begin{aligned}	
+(1) \ \ \ \  \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \hat{y} = \beta_0 + \beta_1*fixed\_acidity + \beta_2*volatile\_acidity 
++ \beta_3*citic\_acid  \\ +\beta_4*residual\_sugar 
++ \ \beta_5*chlorides\\ + \beta_6*free\_sulfur\_dioxide  \\+ \ \beta_7*total\_sulfur\_dioxide   
+\\ + \ \beta_8*density + \beta_9*pH  \\+ \ \beta_{10}*sulphates + \beta_{11}*alcohol 	
+\end{aligned}
+\end{equation*}
+
+However, the marginal coefficient test for each of the variables indicates that the $p$-values for citric acid and chlorides are not low enough to reject the null hypothesis. Thus, we can consider that the contribution of these to the variance of quality is not significantly greater than 0, and so they have been removed from the final model. The resulting linear regression model is described below:
+
+\begin{equation*}
+\begin{aligned}	
+(2) \ \ \ \  \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \  \hat{y} = 59.58 + 0.0616*fixed\_acidity  -1.275*volatile\_acidity 
++0.04318*residual\_sugar \\
++ \  0.00618*free\_sulfur\_dioxide  - \ 0.00257*total\_sulfur\_dioxide   
+\\ - \ 0.5899*density  + \ 0.5068*pH   \\+ 0.7161*sulphates + 0.2637*alcohol
+\end{aligned}
+\end{equation*}
+
+According to the obtained model, the two variables with the highest influence on quality are `volatile acidity` and `density`, specially the latter. This can be misleading however, as it represents the variation in quality per unit of the input, and the scales of the input variables differ in their order of magnitude. Checking the distribution of $density$, for example, the difference between the maximum and minimum values is lower than 0.03, whereas $total\_sulfur\_dioxide$ has a range of over 400. In any case, some conclusions can be extracted from this output. For example, denser wines tend to have a smaller perceived quality due to the negative coefficient, and, on the contrary, those with higher alcohol contents obtain highger quality perception.
+
+\paragraph*{}
+The adjusted R-squared coefficient of the resulting model is rather low, with a value of only 0.29. The regression overall $p$-value, however, is low enough for us to be confident that there exists a relationship between at least part of the input and the output variable, $quality$, performing better than just the simple constant model.
+
+\subsection{Assessing the model: assumptions}
+
+\paragraph*{}
+Let us further examine the quality of the linear regression model by checking if the assumptions are met. In particular, we are interested in testing the linearity of the model and if the residuals are independent, normal and have constant variance (LINE conditions).
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=5in]{figures/qqplot.png}
+	\caption{Plot diagnostics for the linear regression model} 
+	\label{figure:qqplot}
+\end{figure}
+
+\paragraph*{}
+The conducted tests have different results. First of all, the Rainbow test tests the linear relationship between the response and the linear predictor. The $p$-value is high enough to not reject the null hypothesis (0.4325) but in other datasets this value is close to 1. On the other hand, the Durbin-Watson test returns a high $p$-value (0.7377), sign that there is not enough evidence to reject the null hypothesis of autocorrelation of the residuals. Hence, the residuals can be considered as independent. The results for the Jarque-Bera and Breusch-Pagan tests, however, are not so positive. According to their results, residuals are neither normal nor homoscedastic.
+
+\paragraph*{}
+Although the residual plots of Figure \ref{figure:qqplot} are unusual due to the clustering around the integer values, they confirm the previous results. The Normal Q-Q plot is in line with the results of the Jarque-Bera test, showing departures from normality, specially in the first quartiles. From the Cook's distance plot, a significant outlier can be seen, corresponding to observation 4446. Even if we remove this outlier, the statistical assumptions remain the same.
 \section{Logistic Regression}
 
 \subsection{Introduction}
@@ -53,14 +111,6 @@ A classification problem relates input variables $x$ to the output variable $y$,
 	\includegraphics[width=2.5in]{figures/wines.jpg} 
 \end{figure}
 
-
-\subsection{Training and test dataset}
-
-\paragraph*{}
-The data science pipeline often\footnote{Some statistical learning models are robust enough to do not need this division. They can infer the behavior of the whole population from a sample if some statistical hypothesis are fulfilled.} needs to split the original dataset into two smaller pieces: the train and test datasets. If we only evaluate our models in the same dataset, the results will be overestimated (aka overfitting). To provide honest assessments of the performance of the predictive models, we will need to validate the models using a test dataset, a partition that has not been used to build the models in order to avoid bias. 
-
-\paragraph*{}
-In this case, the test dataset consists of the 20\% of the original data (1300 observations) and the training dataset is composed of 5196 data points.
 
 \subsection{Models}
 
