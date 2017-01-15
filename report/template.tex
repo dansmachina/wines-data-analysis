@@ -27,7 +27,7 @@
 \input{preamble.tex}
 
 
-\homework{number}{January 15th, 2016}{Arminda Moreno Díaz}{Jose Luis Contreras, Antonio Javier González and Alejandro González Pérez}
+\homework{number}{January 15th. 2016}{Arminda Moreno Díaz}{Jose Luis Contreras. Antonio Javier González and Alejandro González Pérez}
 
 \pagenumbering{gobble}
 \tableofcontents
@@ -38,7 +38,7 @@
 \section{Analysis of the dataset}
 
 \paragraph*{}
-The dataset to analyze is composed of the red and white variants of the Portuguese "Vinho verde" wine\footnote{Source: http://archive.ics.uci.edu/ml/datasets/Wine+Quality. The original data is divided in two different datasets, and we have joined them in a preprocessing step.}. In total, there are 6495 different instances of wines, where 4898 are white wine and 1597 red wine. On the other hand, the dataset has 12 variables based on physicochemical tests on different wines plus two categorical variables, one for grading the wine quality by experts between 0 (very bad) and 10 (very excellent) and another binary  variable the type: 0 = white wine and 1 = red wine.
+The dataset to analyze is composed of the red and white variants of the Portuguese "Vinho verde" wine\footnote{Source: http://archive.ics.uci.edu/ml/datasets/Wine+Quality. The original data is divided into two different datasets. and we have joined them in a preprocessing step.}. In total, there are 6495 different instances of wines, where 4898 are white wine and 1597 red wine. On the other hand, the dataset has 11 variables based on physicochemical tests on different wines plus two categorical variables, one for grading the wine quality by experts between 0 (very bad) and 10 (very excellent) and another binary variable for the type: $0 \equiv$ white wine and $1 \equiv$ red wine.
 
 \paragraph*{}
 The following table summarizes the distribution of the quantitative variables, highlighting their minimum, maximum, mean and standard deviation values. 
@@ -48,17 +48,17 @@ The following table summarizes the distribution of the quantitative variables, h
 	\begin{tabular}{|l|c|c|c|c|}
 		\hline
 		& \textbf{min} & \textbf{max} & \textbf{mean} & \textbf{SD} \\ \hline
-		\textbf{fixed\_acidity} & 3,800 & 15,900 & 7,215 & 1.296588 \\ \hline
-		\textbf{volatile\_acidity} & 0,0800 & 1,5800 & 0,3396 & 0.164583 \\ \hline
-		\textbf{citric\_acid} & 0,0 & 1,6600 & 0,3187 & 0.1452326 \\ \hline
-		\textbf{residual\_sugar} & 0,600 & 65,800 & 5,444 & 4.758494 \\ \hline
-		\textbf{chlorides} & 0,00900 & 0,61100 & 0,05602 & 0.03503299 \\ \hline
-		\textbf{free\_sulfur\_dioxide} & 1,00 & 289,00 & 30,52 & 17.74849 \\ \hline
-		\textbf{total\_sulfur\_dioxide} & 6,0 & 440,0 & 115,8 & 56.52657 \\ \hline
-		\textbf{density} & 0,9871 & 1,0390 & 0,9947 & 0.002999095 \\ \hline
-		\textbf{pH} & 2,720 & 4,010 & 3,219 & 0.1608116 \\ \hline
-		\textbf{sulphates} & 0,2200 & 2,00 & 0,5313 & 0.148822 \\ \hline
-		\textbf{alcohol} & 8,00 & 14,90 & 10,49 & 1.192768 \\ \hline
+		\textbf{fixed\_acidity} & 3.800 & 15.900 & 7.215 & 1.296 \\ \hline
+		\textbf{volatile\_acidity} & 0.0800 & 1.5800 & 0.3396 & 0.164 \\ \hline
+		\textbf{citric\_acid} & 0.0 & 1.6600 & 0.3187 & 0.145 \\ \hline
+		\textbf{residual\_sugar} & 0.600 & 65.800 & 5.444 & 4.75 \\ \hline
+		\textbf{chlorides} & 0.009 & 0.611 & 0.056 & 0.035 \\ \hline
+		\textbf{free\_sulfur\_dioxide} & 1.00 & 289.00 & 30.52 & 17.749 \\ \hline
+		\textbf{total\_sulfur\_dioxide} & 6.0 & 440.0 & 115.8 & 56.52 \\ \hline
+		\textbf{density} & 0.9871 & 1.0390 & 0.9947 & 0.003	 \\ \hline
+		\textbf{pH} & 2.720 & 4.010 & 3.219 & 0.160 \\ \hline
+		\textbf{sulphates} & 0.2200 & 2.00 & 0.5313 & 0.148 \\ \hline
+		\textbf{alcohol} & 8.00 & 14.90 & 10.49 & 1.192 \\ \hline
 	\end{tabular}%
 	\caption{Summary distribution of the quantitative variables.}
 	\label{table:variables}
@@ -68,12 +68,12 @@ The following table summarizes the distribution of the quantitative variables, h
 \subsubsection{Type}
 
 \paragraph*{}
-As we have already seen, the distribution of the `type` of wines is considerably unbalanced, since the 75\% of the observations are white wines, and the other 25\% are red wines. One of the goals of this project will be classify if a new wine is red or white according to its attributes.
+As we have already seen, the distribution of the `type` of wines is considerably unbalanced, since the 75\% of the observations are white wines, and the other 25\% are red wines. One of the goals of this project will be classifying if a new wine is red or white according to its attributes.
 
 \begin{figure}[H]
 	\centering
 	\includegraphics[width=3.7in]{figures/type-distribution.png}
-	\caption{Plot diagnostics for the linear regression model} 
+	\caption{Distribution of the `type`variable.} 
 	\label{figure:type}
 \end{figure}
 
@@ -91,7 +91,7 @@ The `quality` is actually a categorical variable, as we can see in the following
 \subsection{Correlation analysis}
 
 \paragraph*{}
-Let's now study the linear relationships between wine quantitative variables. The variables to be inspected are the quantitative attributes `fixed\_acidity`, `volatile\_acidity`, `citic\_acid`, `residual\_sugar`, `chlorides`, `free\_sulfur\_dioxide`, `total\_sulfur\_dioxide`, `density`, `pH`, `sulphates` and `alcohol`\footnote{We have decided to maintain these 12 variables and do not try to reduce them using a PCA analysis because we are interested in the original meaning and interpretation.}. 
+Let us now study the linear relationships between wine quantitative variables. The variables to be inspected are the quantitative attributes `fixed\_acidity`, `volatile\_acidity`, `citic\_acid`, `residual\_sugar`, `chlorides`, `free\_sulfur\_dioxide`, `total\_sulfur\_dioxide`, `density`, `pH`, `sulphates` and `alcohol`\footnote{We have decided to maintain these 11 variables and do not try to reduce them using a PCA analysis because we are interested in the original meaning and interpretation.}. 
 
 \begin{figure}[H]
 	\centering
@@ -219,7 +219,7 @@ Let us start with the simplest model: the constant model. Since we know that the
 A bit more than 75\% of accuracy just by guessing that all the wines will be red. However, we are not using the chemical information. Let us now include one of the variables to the logistic model. Which one? The one which decreases the most the AIC. The AIC is a measure of the quality of different models, relative to each of the other models. Ideal for model selection.
 
 \paragraph*{}
-The function `step` in R does this task for us: it chooses a model by AIC in a stepwise algorithm. We would use it in the forward direction: tt starts by the simplest constant model, and it tries to achieve the best model up to the full model, previously defined. Since we will go step by step, we will set the number of `steps` manually, to see what happens in each level.
+The function `step` in R does this task for us: it chooses a model by AIC in a stepwise algorithm. We would use it in the forward direction: it starts by the simplest constant model, and it tries to achieve the best model up to the full model, previously defined. Since we will go step by step, we will set the number of `steps` manually, to see what happens in each level.
 
 \begin{table}[H]
 	\centering
@@ -268,7 +268,7 @@ Let us include one more variable to the following model and see what happens:
 \end{table}
 
 
-The AIC decays the most with the inclusion of `density`, reaching an accuracy of 95\%. Using just two variables of the dataset, we are just wrong in 58 classifications (21 should have been red, and 37 white) up to a total of 1300 observations.
+The AIC decays the most with the inclusion of `density`, reaching an accuracy of 95\%. Using just two variables of the dataset, we are just mistaken in 58 classifications (21 should have been red, and 37 white) up to a total of 1300 observations.
 
 \paragraph*{}
 (5) \ \ \ $logit(\hat{y}) = -782.71663  -0.07262*total\_sulfur\_dioxide +792.08044  *density$
@@ -277,7 +277,7 @@ The AIC decays the most with the inclusion of `density`, reaching an accuracy of
 The odds can be interpreted such that the `density` contributes to the probability of getting a red wine (success) while the `total\_sulphur\_dioxide` increases the probability of being classified as a whine type, controlling for the other variable.
 
 \paragraph*{}
-We stop here, since the addition of more variables does not significantly increase the accuracy of the model. The following plot summarizes the accuracy of the logistic model with respect the number of variables included in the model, following the stepwise algorithm.
+We stop here, since the addition of more variables does not significantly increase the accuracy of the model. The following plot summarizes the accuracy of the logistic model with respect to the number of variables included in the model, following the stepwise algorithm.
 
 
 \begin{figure}[H]
@@ -295,7 +295,7 @@ We can detect in Figure \ref{figure:accuracy-model} that using just 5 variables 
 \end{aligned}
 \end{equation*}	
 
-Both `total\_sulphur\_dioxide` and `residual\_sugar` decreases the odds of red wine. The probability of being a red wine is less than the probability of being a white whine if you have high values of these two variables. On the other hand, `density`, `alcohol`and `volatile\_acidity` increases the odds of being red type. For instance, when `density` is increased by one unit and all other variables are held constant the odds of $y = 1$ are multiplied by $e^{3}$.
+Both `total\_sulphur\_dioxide` and `residual\_sugar` decreases the odds of red wine. The probability of being a red wine is less than the probability of being a white whine if you have high values of these two variables. On the other hand, `density`, `alcohol` and `volatile\_acidity` increases the odds of being red type. For instance, when `density` is increased by one unit and all other variables are held constant the odds of $y = 1$ are multiplied by $e^{3}$.
 
 \subsection{Discussion}
 
@@ -304,7 +304,7 @@ After our analysis, we have seen that two different approaches are possible in o
 
 \begin{itemize}
 	\item \textbf{Best classification}: In this case, we would like to get the best accuracy as possible. We do not worry in terms of interpretation, but we are looking for the model with less number of parameters that reaches the best accuracy. The model (6) has a 99\% of success using 5 of the original variables. 
-	\item \textbf{Simplest explanation}: We are interesting in understanding the data and interpret the parameters of the classification predictors as straightforward as possible, imposing a minimum of accuracy. In our case, the model (5) reaches a 95\% accuracy using just 2 variables, which is very useful to easily describe the model. For instance, we can plot these two variables in the plane:
+	\item \textbf{Simplest explanation}: We are interesting in understanding the data and interpreting the parameters of the classification predictors as straightforward as possible, imposing a minimum of accuracy. In our case, the model (5) reaches a 95\% accuracy using just 2 variables, which is very useful to easily describe the model. For instance, we can plot these two variables in the plane:
 	
 	\begin{figure}[H]
 		\centering
@@ -313,7 +313,7 @@ After our analysis, we have seen that two different approaches are possible in o
 		\label{figure:cluster}
 	\end{figure}
 	
-	This plot shows the variables `density` and `total\_sulphur\_dioxide` but colored by type. As we can see, it is clear that we have an almost perfect clusters between red and white wines. That is why we are having such a great 95\% accuracy in our simpler model. 
+	This plot shows the variables `density` and `total\_sulphur\_dioxide` but colored by type. As we can see, it is clear that we have almost perfect clusters between red and white wines. That is why we are having such a great 95\% accuracy in our simpler model. 
 \end{itemize}
 
 
@@ -347,7 +347,7 @@ However, the marginal coefficient test for each of the variables indicates that 
 \end{aligned}
 \end{equation*}
 
-According to the obtained model, the two variables with the highest influence on quality are `volatile acidity` and `density`, specially the latter. This can be misleading however, as it represents the variation in quality per unit of the input, and the scales of the input variables differ in their order of magnitude. Checking the distribution of $density$, for example, the difference between the maximum and minimum values is lower than 0.03, whereas $total\_sulfur\_dioxide$ has a range of over 400. In any case, some conclusions can be extracted from this output. For example, denser wines tend to have a smaller perceived quality due to the negative coefficient, and, on the contrary, those with higher alcohol contents obtain highger quality perception.
+According to the obtained model, the two variables with the highest influence on quality are `volatile acidity` and `density`, specially the latter. This can be misleading however, as it represents the variation in quality per unit of the input, and the scales of the input variables differ in their order of magnitude. Checking the distribution of $density$ in Table \ref{table:variables}, for example, the difference between the maximum and minimum values is lower than 0.03, whereas $total\_sulfur\_dioxide$ has a range of over 400. In any case, some conclusions can be extracted from this output. For example, denser wines tend to have a smaller perceived quality due to the negative coefficient, and, on the contrary, those with higher alcohol contents obtain highger quality perception.
 
 \paragraph*{}
 The adjusted R-squared coefficient of the resulting model is rather low, with a value of only 0.29. The regression overall $p$-value, however, is low enough for us to be confident that there exists a relationship between at least part of the input and the output variable, $quality$, performing better than just the simple constant model.
@@ -365,7 +365,7 @@ Let us further examine the quality of the linear regression model by checking if
 \end{figure}
 
 \paragraph*{}
-The conducted tests have different results. First of all, the Rainbow test tests the linear relationship between the response and the linear predictor. The $p$-value is high enough to not reject the null hypothesis (0.4325) but in other datasets this value is close to 1. On the other hand, the Durbin-Watson test returns a high $p$-value (0.7377), sign that there is not enough evidence to reject the null hypothesis of autocorrelation of the residuals. Hence, the residuals can be considered as independent. The results for the Jarque-Bera and Breusch-Pagan tests, however, are not so positive. According to their results, residuals are neither normal nor homoscedastic.
+The conducted tests have different results. First of all, the Rainbow test tests the linear relationship between the response and the linear predictor. The $p$-value is high enough to not reject the null hypothesis (0.4325) but in other datasets this value is closer to 1. On the other hand, the Durbin-Watson test returns a high $p$-value (0.7377), sign that there is not enough evidence to reject the null hypothesis of autocorrelation of the residuals. Hence, the residuals can be considered as independent. The results for the Jarque-Bera and Breusch-Pagan tests, however, are not so positive. According to their results, residuals are neither normal nor homoscedastic.
 
 \paragraph*{}
 Although the residual plots of Figure \ref{figure:qqplot} are unusual due to the clustering around the integer values, they confirm the previous results. The Normal Q-Q plot is in line with the results of the Jarque-Bera test, showing departures from normality, specially in the first quartiles. From the Cook's distance plot, a significant outlier can be seen, corresponding to observation 4446. Even if we remove this outlier, the statistical assumptions remain the same.
@@ -373,7 +373,7 @@ Although the residual plots of Figure \ref{figure:qqplot} are unusual due to the
 \subsection{Alternative model based on the sweetness of wines}
 
 \paragraph*{}
-We can try to improve the validation and interpretation of the model by defining a new categorical variable, `residual\_sugar2`, which divides wines in three groups according on their sweetness \footnote{Terms used to indicate sweetness of wine: https://en.wikipedia.org/wiki/Sweetness\_of\_wine\#Residual\_sugar}. The sweetness of the wines is defined by its residual sugar, and commonly the classification is `dry` wines for values up to 4 g/l, `medium\_dry` up to 12 g/l,  `medium` up to 45 g/l and `sweet` more than 45 g/l. In out dataset, the highest value for `residual\_sugar` is 18, thus we only consider the first three clusters:
+We can try to improve the validation and interpretation of the model by defining a new categorical variable, `residual\_sugar2`, which divides wines in three groups according on their sweetness\footnote{Terms used to indicate sweetness of wine: https://en.wikipedia.org/wiki/Sweetness\_of\_wine\#Residual\_sugar}. The sweetness of the wines is defined by its residual sugar, and commonly the classification is `dry` wines for values up to 4 g/l, `medium\_dry` up to 12 g/l,  `medium` up to 45 g/l and `sweet` more than 45 g/l. In out dataset, the highest value for `residual\_sugar` is 18, thus we only consider the first three clusters:
 
 \begin{equation*}
 \begin{aligned}	
@@ -417,7 +417,7 @@ The final step is to evaluate the performance of the model. In order to do so, l
 As the results above show, our predicted variable quality has a standard deviation of $\sigma = 0.87$. When fed with the test set, the linear regression model outputs predictions with an
 RMSE of 0.7426 for Model 1 and 0.7325 for Model 2. Therefore, and in line with what has been stated before, the interpretation of these results is positive, as RMSE is lower than the data’s standard deviation.
 
-\subsection{Conclusion}
+\subsection{Discussion}
 
 \paragraph*{}
 According to evaluation results, the model has a rather good performance at predicting wine quality. Even though the it does not have a very high R-squared coefficient, the RMSE metric is low enough for us to consider it an interesting option to predict a wine's quality. Some remarks can be made, however. First of all, our input data is not uniformly distributed, with a majority of the observations taking quality values between 4 and 6. Thus, our model could be slightly overfitted for those kind of values, and there is a risk that the precision of results could drop if the input data happened to contain more extreme values. 

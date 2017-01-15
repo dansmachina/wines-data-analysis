@@ -21,4 +21,4 @@
 \contentsline {subsection}{\numberline {3.3}Assessing the model: assumptions}{9}{subsection.3.3}
 \contentsline {subsection}{\numberline {3.4}Alternative model based on the sweetness of wines}{9}{subsection.3.4}
 \contentsline {subsection}{\numberline {3.5}Evaluation}{10}{subsection.3.5}
-\contentsline {subsection}{\numberline {3.6}Conclusion}{10}{subsection.3.6}
+\contentsline {subsection}{\numberline {3.6}Discussion}{10}{subsection.3.6}
