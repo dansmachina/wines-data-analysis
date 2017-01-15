@@ -38,10 +38,10 @@
 \section{Analysis of the dataset}
 
 \paragraph*{}
-The dataset to analyze is composed of the red and white variants of the Portuguese "Vinho verde" wine\footnote{Source: http://archive.ics.uci.edu/ml/datasets/Wine+Quality. The original data is divided in two different datasets, and we have joined them in a preprocessing step.}. In total, there are 6495 different instances of wines, where 4898 are white wine and 1597 red wine. On the other hand, the dataset has 12 variables\footnote{We have decided to maintain these 12 variables and do not try to reduce them using a PCA analysis because we are interested in the original meaning and interpretation.} based on physicochemical tests on different wines plus two categorical variables, one for grading the wine quality by experts between 0 (very bad) and 10 (very excellent) and another binary  variable the type: 0 = white wine and 1 = red wine.
+The dataset to analyze is composed of the red and white variants of the Portuguese "Vinho verde" wine\footnote{Source: http://archive.ics.uci.edu/ml/datasets/Wine+Quality. The original data is divided in two different datasets, and we have joined them in a preprocessing step.}. In total, there are 6495 different instances of wines, where 4898 are white wine and 1597 red wine. On the other hand, the dataset has 12 variables based on physicochemical tests on different wines plus two categorical variables, one for grading the wine quality by experts between 0 (very bad) and 10 (very excellent) and another binary  variable the type: 0 = white wine and 1 = red wine.
 
 \paragraph*{}
-The following table summarizes the distribution of the quantitative variables, highlighting their minimum, maximum, mean and standard deviation values.
+The following table summarizes the distribution of the quantitative variables, highlighting their minimum, maximum, mean and standard deviation values. 
 
 \begin{table}[h]
 	\centering
@@ -68,22 +68,22 @@ The following table summarizes the distribution of the quantitative variables, h
 \subsubsection{Type}
 
 \paragraph*{}
-As we have already seen, the distribution of the `type` of wines is considerably unbalanced, since the 75\% of the observations are white wines, and the other 25\% are red wines.
+As we have already seen, the distribution of the `type` of wines is considerably unbalanced, since the 75\% of the observations are white wines, and the other 25\% are red wines. One of the goals of this project will be classify if a new wine is red or white according to its attributes.
 
 \begin{figure}[H]
 	\centering
-	\includegraphics[width=4.3in]{figures/type-distribution.png}
+	\includegraphics[width=3.7in]{figures/type-distribution.png}
 	\caption{Plot diagnostics for the linear regression model} 
 	\label{figure:type}
 \end{figure}
 
 \subsubsection{Quality}
 \paragraph*{}
-The `quality` is actually a categorical variable, as we can see in the following histogram. However, we will treat it as a continuous variable within the regression modeling.
+The `quality` is actually a categorical variable, as we can see in the following histogram. However, we will treat it as a continuous variable within the regression modeling to predict the quality of a new wine.
 
 \begin{figure}[H]
 	\centering
-	\includegraphics[width=4.3in]{figures/quality-distribution.png}
+	\includegraphics[width=4in]{figures/quality-distribution.png}
 	\caption{Histogram of wines quality: red vs. white'} 
 	\label{figure:quality}
 \end{figure}
@@ -91,20 +91,20 @@ The `quality` is actually a categorical variable, as we can see in the following
 \subsection{Correlation analysis}
 
 \paragraph*{}
-Let's now study the linear relationships between wine quantitative variables. The variables to be inspected are the quantitative attributes `fixed\_acidity`, `volatile\_acidity`, `citic\_acid`, `residual\_sugar`, `chlorides`, `free\_sulfur\_dioxide`, `total\_sulfur\_dioxide`, `density`, `pH`, `sulphates` and `alcohol`. 
+Let's now study the linear relationships between wine quantitative variables. The variables to be inspected are the quantitative attributes `fixed\_acidity`, `volatile\_acidity`, `citic\_acid`, `residual\_sugar`, `chlorides`, `free\_sulfur\_dioxide`, `total\_sulfur\_dioxide`, `density`, `pH`, `sulphates` and `alcohol`\footnote{We have decided to maintain these 12 variables and do not try to reduce them using a PCA analysis because we are interested in the original meaning and interpretation.}. 
 
 \begin{figure}[H]
 	\centering
-	\includegraphics[width=5.5in]{figures/correlations.png}
+	\includegraphics[width=5.2in]{figures/correlations.png}
 	\caption{Matrix of pairwise correlations} 
 	\label{figure:correlationsy}
 \end{figure}
 
-As we can see, the linear relations between variables are weak (the tonality of the colors is, in general, soft). We can only assure that `free\_sulfur\_dioxide` obviously is positive related with the `total\_sulfur\_dioxide`. Also the `alcohol` has negative effects on the `density` of the wines. To conclude, it is interesting to mention that the `sulphates` does not seem linearly related with any of the other variables. 
+As we can see, the linear relations between variables are weak (the tonality of the colors is, in general, soft). We can only assure that `free\_sulfur\_dioxide` obviously is positively related with the `total\_sulfur\_dioxide`. Also the `alcohol` has negative effects on the `density` of the wines. To conclude, it is interesting to mention that the `sulphates` does not seem linearly related with any of the other variables. 
 
 \subsection{Coefficients of determination}
 \paragraph*{}
-The coefficients of determination can also give us a good insight into linear relationships within the data. As Table \ref{table:determination} below displays, important linear relations are present in this set. Specifically, `density`and `residual\_sugar` re the most linearly explained by the other variables. Slightly less influenced, but still scoring high, are `fixed\_acidity` and `alcohol`.
+The coefficients of determination can also give us a good insight into linear relationships within the data. As Table \ref{table:determination} below displays, important linear relations are present in this set. Specifically, `density` and `residual\_sugar` are the most linearly explained by the other variables. Slightly less influenced, but still scoring high, are `fixed\_acidity` and `alcohol`.
 
 \begin{table}[h]
 	\centering
