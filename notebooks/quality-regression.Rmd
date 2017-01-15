@@ -101,9 +101,6 @@ Although the residual plots are unusual due to the clustering around the integer
 The final step is to evaluate the performance of the model. In order to do so, let us measure the accuracy of predictions by calculating the value of our error metric of choice: RMSE. The standard deviation of our data will be used as a reference to assess the correctness of RMSE values.
 
 ```{r evaluation, message=FALSE, warning=FALSE}
-# Conclusiones: en cuanto a hipotesis nuestro modelo es bastante mierda. Ademas parece que esta bien
-# para qualitys entre 4 y 6 mas o menos, los valores mas grandes van mal. Esto es normal porque la
-# muestra que tenemos es bastante mala (hacer histograma)
 # Standard deviation of our data
 sd(df$quality)
 
@@ -129,10 +126,6 @@ As the results above show, our predicted variable $quality$ has a standard devia
 rmse.discrete <- (sqrt(mean((test$quality - round(predicted))^2)))
 rmse.discrete
 
-# Conclusiones: No funciona mal en cuanto a resultados, pero no nos fiamos, entre que los
-# datos son malillos (en cuanto a distribucion) y que no hemos usado la tecnica adecuada (ver abajo)
-# En cualquier caso, posiblemente seria mejor usar Logistic Regression (o algun metodo de clasificacion)
-# para predecir la quality, que realmente no es continua.
 ```
 
 # Conclusions 
