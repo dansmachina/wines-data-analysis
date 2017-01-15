@@ -12,6 +12,7 @@
 \usepackage{amsfonts}
 \usepackage{amsmath}
 \usepackage{hyperref}
+\usepackage{booktabs}
 
 \setcounter{tocdepth}{4}
 \setcounter{secnumdepth}{4}
@@ -26,7 +27,7 @@
 \input{preamble.tex}
 
 
-\homework{number}{date, 2016}{Arminda Moreno Díaz}{Jose Luis Contreras Santos, Antonio Javier González Ferrer and Alejandro González Pérez}
+\homework{number}{date, 2016}{Arminda Moreno Díaz}{Jose Luis Contreras, Antonio Javier González and Alejandro González Pérez}
 
 \pagenumbering{gobble}
 \tableofcontents
@@ -36,66 +37,101 @@
 
 \section{Analysis of the dataset}
 
-
-\section{Regression}
-
-\subsection{Introduction}
 \paragraph*{}
-The aim of this section is to use linear regression to model and predict a wine's quality based on its physicochemical attributes. To do this, we will consider the variable `quality` as a continuous variable ranging from 0 to 10. It is worth noting, however, that this variable is originally a categorical one which can only take one of the 11 integer values comprised between 0 and 10. Therefore, as predictions will be continuous, many of them will most likely be slightly off due to this discrepancy. This should not pose a problem,  as the usual error metrics, such as RMSE, can be obtained anyways.
-
-\subsection{Training and test dataset}
+The dataset to analyze is composed of the red and white variants of the Portuguese "Vinho verde" wine. In total, there are 6495 different instances of wines, where 4898 are white wine and 1597 red wine. On the other hand, the dataset has 12 variables based on physicochemical tests on different wines plus two categorical variables, one for grading the wine quality by experts between 0 (very bad) and 10 (very excellent) and another binary variable, 0 = white wine and 1 = red wine.
 
 \paragraph*{}
-The data science pipeline often\footnote{Some statistical learning models are robust enough to do not need this division. They can infer the behavior of the whole population from a sample if some statistical hypothesis are fulfilled.} needs to split the original dataset into two smaller pieces: the train and test datasets. If we only evaluate our models in the same dataset, the results will be overestimated (aka overfitting). To provide honest assessments of the performance of the predictive models, we will need to validate the models using a test dataset, a partition that has not been used to build the models in order to avoid bias. 
+The following Table \ref{table:variables} summarizes the distribution of the quantitative variables, highlighting their minimum, maximum, mean and standard deviation values.
+
+\begin{table}[h]
+	\centering
+	\begin{tabular}{|l|c|c|c|c|}
+		\hline
+		& \textbf{min} & \textbf{max} & \textbf{mean} & \textbf{SD} \\ \hline
+		\textbf{fixed\_acidity} & 3,800 & 15,900 & 7,215 & 1.296588 \\ \hline
+		\textbf{volatile\_acidity} & 0,0800 & 1,5800 & 0,3396 & 0.164583 \\ \hline
+		\textbf{citric\_acid} & 0,0 & 1,6600 & 0,3187 & 0.1452326 \\ \hline
+		\textbf{residual\_sugar} & 0,600 & 65,800 & 5,444 & 4.758494 \\ \hline
+		\textbf{chlorides} & 0,00900 & 0,61100 & 0,05602 & 0.03503299 \\ \hline
+		\textbf{free\_sulfur\_dioxide} & 1,00 & 289,00 & 30,52 & 17.74849 \\ \hline
+		\textbf{total\_sulfur\_dioxide} & 6,0 & 440,0 & 115,8 & 56.52657 \\ \hline
+		\textbf{density} & 0,9871 & 1,0390 & 0,9947 & 0.002999095 \\ \hline
+		\textbf{pH} & 2,720 & 4,010 & 3,219 & 0.1608116 \\ \hline
+		\textbf{sulphates} & 0,2200 & 2,00 & 0,5313 & 0.148822 \\ \hline
+		\textbf{alcohol} & 8,00 & 14,90 & 10,49 & 1.192768 \\ \hline
+	\end{tabular}%
+	\caption{Summary distribution of the quantitative variables.}
+	\label{table:variables}
+\end{table}
+
+\subsection{Distribution of target variables}
+\subsubsection{Type}
 
 \paragraph*{}
-In this case, the test dataset consists of the 20\% of the original data (1300 observations) and the training dataset is composed of 5196 data points.
-
-\subsection{Model fitting}
-After splitting the data in training and test sets, the training set was used to fit a linear regression model. At first, all variables were used as explanatory variables for the model:
-
-\begin{equation*}
-\begin{aligned}	
-(1) \ \ \ \  \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \hat{y} = \beta_0 + \beta_1*fixed\_acidity + \beta_2*volatile\_acidity 
-+ \beta_3*citic\_acid  \\ +\beta_4*residual\_sugar 
-+ \ \beta_5*chlorides\\ + \beta_6*free\_sulfur\_dioxide  \\+ \ \beta_7*total\_sulfur\_dioxide   
-\\ + \ \beta_8*density + \beta_9*pH  \\+ \ \beta_{10}*sulphates + \beta_{11}*alcohol 	
-\end{aligned}
-\end{equation*}
-
-However, the marginal coefficient test for each of the variables indicates that the $p$-values for citric acid and chlorides are not low enough to reject the null hypothesis. Thus, we can consider that the contribution of these to the variance of quality is not significantly greater than 0, and so they have been removed from the final model. The resulting linear regression model is described below:
-
-\begin{equation*}
-\begin{aligned}	
-(2) \ \ \ \  \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \  \hat{y} = 59.58 + 0.0616*fixed\_acidity  -1.275*volatile\_acidity 
-+0.04318*residual\_sugar \\
-+ \  0.00618*free\_sulfur\_dioxide  - \ 0.00257*total\_sulfur\_dioxide   
-\\ - \ 0.5899*density  + \ 0.5068*pH   \\+ 0.7161*sulphates + 0.2637*alcohol
-\end{aligned}
-\end{equation*}
-
-According to the obtained model, the two variables with the highest influence on quality are `volatile acidity` and `density`, specially the latter. This can be misleading however, as it represents the variation in quality per unit of the input, and the scales of the input variables differ in their order of magnitude. Checking the distribution of $density$, for example, the difference between the maximum and minimum values is lower than 0.03, whereas $total\_sulfur\_dioxide$ has a range of over 400. In any case, some conclusions can be extracted from this output. For example, denser wines tend to have a smaller perceived quality due to the negative coefficient, and, on the contrary, those with higher alcohol contents obtain highger quality perception.
-
-\paragraph*{}
-The adjusted R-squared coefficient of the resulting model is rather low, with a value of only 0.29. The regression overall $p$-value, however, is low enough for us to be confident that there exists a relationship between at least part of the input and the output variable, $quality$, performing better than just the simple constant model.
-
-\subsection{Assessing the model: assumptions}
-
-\paragraph*{}
-Let us further examine the quality of the linear regression model by checking if the assumptions are met. In particular, we are interested in testing the linearity of the model and if the residuals are independent, normal and have constant variance (LINE conditions).
+As we have already seen, the distribution of the `type` of wines is considerably unbalanced, since the 75\% of the observations are white wines, and the other 25\% are red wines.
 
 \begin{figure}[H]
 	\centering
-	\includegraphics[width=5in]{figures/qqplot.png}
+	\includegraphics[width=4.3in]{figures/type-distribution.png}
 	\caption{Plot diagnostics for the linear regression model} 
-	\label{figure:qqplot}
+	\label{figure:type}
 \end{figure}
 
+\subsubsection{Quality}
 \paragraph*{}
-The conducted tests have different results. First of all, the Rainbow test tests the linear relationship between the response and the linear predictor. The $p$-value is high enough to not reject the null hypothesis (0.4325) but in other datasets this value is close to 1. On the other hand, the Durbin-Watson test returns a high $p$-value (0.7377), sign that there is not enough evidence to reject the null hypothesis of autocorrelation of the residuals. Hence, the residuals can be considered as independent. The results for the Jarque-Bera and Breusch-Pagan tests, however, are not so positive. According to their results, residuals are neither normal nor homoscedastic.
+The `quality` is actually a categorical variable, as we can see in the following histogram. However, we will treat it as a continuous variable within the regression modeling.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=4.3in]{figures/quality-distribution.png}
+	\caption{Histogram of wines quality: red vs. white'} 
+	\label{figure:quality}
+\end{figure}
+
+\subsection{Correlation analysis}
 
 \paragraph*{}
-Although the residual plots of Figure \ref{figure:qqplot} are unusual due to the clustering around the integer values, they confirm the previous results. The Normal Q-Q plot is in line with the results of the Jarque-Bera test, showing departures from normality, specially in the first quartiles. From the Cook's distance plot, a significant outlier can be seen, corresponding to observation 4446. Even if we remove this outlier, the statistical assumptions remain the same.
+Let's now study the linear relationships between wine quantitative variables. The variables to be inspected are the quantitative attributes `fixed\_acidity`, `volatile\_acidity`, `citic\_acid`, `residual\_sugar`, `chlorides`, `free\_sulfur\_dioxide`, `total\_sulfur\_dioxide`, `density`, `pH`, `sulphates` and `alcohol`. 
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=5.5in]{figures/correlations.png}
+	\caption{Matrix of pairwise correlations} 
+	\label{figure:correlationsy}
+\end{figure}
+
+As we can see, the linear relations between variables are weak (the tonality of the colors is, in general, soft). We can only assure that `free\_sulfur\_dioxide` obviously is positive related with the `total\_sulfur\_dioxide`. Also the `alcohol` has negative effects on the `density` of the wines. To conclude, it is interesting to mention that the `sulphates` does not seem linearly related with any of the other variables. 
+
+\subsection{Coefficients of determination}
+\paragraph*{}
+The coefficients of determination can also give us a good insight into linear relationships within the data. As Table \ref{table:determination} below displays, important linear relations are present in this set. Specifically, `density`and `residual\_sugar` re the most linearly explained by the other variables. Slightly less influenced, but still scoring high, are `fixed\_acidity` and `alcohol`.
+
+\begin{table}[h]
+	\centering
+		\begin{tabular}{@{}llcccc@{}}
+			\toprule
+			\textbf{} & \textbf{fixed\_acidity} & \textbf{volatile\_acidity} & \textbf{citic\_acid} & \textbf{residual\_sugar} & \textbf{chlorides}  \\ \midrule
+			\textbf{R-squared} & 0.7957831 & 0.4866891 & 0.3776351 & 0.8616690 & 0.3870994  \\ \bottomrule
+		\end{tabular}
+
+	\vspace{0.5cm}
+
+	\centering
+		\begin{tabular}{@{}llccccc@{}}
+			\toprule
+			\textbf{} & \textbf{free\_sulfur\_dioxide} & \textbf{total\_sulfur\_dioxide} & \textbf{density} & \textbf{pH} & \textbf{sulphates} & \textbf{alcohol} \\ \midrule
+			\textbf{R-squared} &  0.5324288 &0.6598145 & 0.9371628 & 0.6058479 & 0.3513432 & 0.7908480 \\ \bottomrule
+		\end{tabular}
+	\caption{Coefficient of determination for each of the analyzed variables.}
+	\label{table:determination}
+\end{table}
+
+\subsection{Effective dependence coefficient}
+\paragraph*{}
+
+Until this point, our analysis shows weak linear relations in this dataset. Further proof of this fact can be found in the effective dependence coefficient of the R matrix: D(R) = 0.4052199. This means that, altogether, linear dependences explain only 40\% of the variability of the data. Hence, the linear regression model will probably not perform well in this dataset.
+
+
 \section{Logistic Regression}
 
 \subsection{Introduction}
@@ -109,9 +145,17 @@ A classification problem relates input variables $x$ to the output variable $y$,
 
 \begin{figure}[H]
 	\centering
-	\includegraphics[width=2.5in]{figures/wines.jpg} 
+	\includegraphics[width=1.5in]{figures/wines.jpg} 
 \end{figure}
 
+
+\subsection{Training and test dataset}
+
+\paragraph*{}
+The data science pipeline often\footnote{Some statistical learning models are robust enough to do not need this division. They can infer the behavior of the whole population from a sample if some statistical hypothesis are fulfilled.} needs to split the original dataset into two smaller pieces: the train and test datasets. If we only evaluate our models in the same dataset, the results will be overestimated (aka overfitting). To provide honest assessments of the performance of the predictive models, we will need to validate the models using a test dataset, a partition that has not been used to build the models in order to avoid bias. 
+
+\paragraph*{}
+In this case, the test dataset consists of the 20\% of the original data (1300 observations) and the training dataset is composed of 5196 data points.
 
 \subsection{Models}
 
@@ -130,9 +174,9 @@ We start by defining a logistic regression model with all the 11 attributes as t
 \begin{equation*}
 \begin{aligned}	
 (1) \ \ \ \  \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ logit(\hat{y}) = \beta_0 + \beta_1*fixed\_acidity + \beta_2*volatile\_acidity 
- + \beta_3*citic\_acid  \\ +\beta_4*residual\_sugar 
++ \beta_3*citic\_acid  \\ +\beta_4*residual\_sugar 
 + \ \beta_5*chlorides\\ + \beta_6*free\_sulfur\_dioxide  \\+ \ \beta_7*total\_sulfur\_dioxide   
- \\ + \ \beta_8*density + \beta_9*pH  \\+ \ \beta_{10}*sulphates + \beta_{11}*alcohol 	
+\\ + \ \beta_8*density + \beta_9*pH  \\+ \ \beta_{10}*sulphates + \beta_{11}*alcohol 	
 \end{aligned}
 \end{equation*}
 
@@ -141,9 +185,9 @@ At first sight, each of the coefficient has a marginal test which attempts the n
 \begin{equation*}
 \begin{aligned}	
 (2) \ \ \ \  \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \  logit(\hat{y}) = \beta_0 + \beta_1*fixed\_acidity + \beta_2*volatile\_acidity 
-  +\beta_3*residual\_sugar \\
++\beta_3*residual\_sugar \\
 + \ \beta_4*chlorides + \beta_5*free\_sulfur\_dioxide  \\+ \ \beta_6*total\_sulfur\_dioxide   
- + \ \beta_7*density \\ + \ \beta_8*pH  +  \beta_{9}*alcohol
++ \ \beta_7*density \\ + \ \beta_8*pH  +  \beta_{9}*alcohol
 \end{aligned}
 \end{equation*}
 
@@ -192,8 +236,8 @@ The function `step` does this task for us: it chooses a model by AIC in a stepwi
 		pH                                      & 5278.9                            \\ \hline
 		alcohol                                 & 5836.3                            \\ \hline
 	\end{tabular}
-		\caption{Comparing logistic regression models using just one predictor}
-		\label{table:one-predictor}
+	\caption{Comparing logistic regression models using just one predictor}
+	\label{table:one-predictor}
 \end{table}
 
 \paragraph*{}
@@ -247,7 +291,7 @@ We stop here, since the addition of more variables does not significantly increa
 We can detect in Figure \ref{figure:accuracy-model} that using just 5 variables in the logistic regression mode we achieve the same accuracy (99\%) than using all the 9 variables from the full model (2), getting this final model:
 \begin{equation*}
 \begin{aligned}	
-(6) \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \  \   logit(\hat{y}) = -1.945e^{+3}  -4.375e^{-2}*total\_sulfur\_dioxide + 1.937e^{3}*density \\ \  -7.818e^{-1}*residual\_sugar \\  + \ 2.065*alcohol \\ + \ 7.016*volatile\_acidity
+(6) \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \  \   logit(\hat{y}) = -1.945e^{3}  -4.375e^{-2}*total\_sulfur\_dioxide + 1.937e^{3}*density \\ \  -7.818e^{-1}*residual\_sugar \\  + \ 2.065*alcohol \\ + \ 7.016*volatile\_acidity
 \end{aligned}
 \end{equation*}	
 
@@ -272,12 +316,59 @@ After our analysis, we have seen that two different approaches are possible in o
 	This plot shows the variables `density` and `total\_sulphur\_dioxide` but colored by type. As we can see, it is clear that we have an almost perfect clusters between red and white wines. That is why we are having such a great 95\% accuracy in our simpler model. 
 \end{itemize}
 
-\paragraph*{TO (POSSIBLE) DO:}
-\begin{itemize}
-	\item Analisis de residuos (o comentar porque no los analizamos).
-	\item Hacer plot(model) y comentar algo, especialmente del último plot.
-	\item Another point.
-\end{itemize}
+
+\section{Regression}
+
+\subsection{Introduction}
+\paragraph*{}
+The aim of this section is to use linear regression to model and predict a wine's quality based on its physicochemical attributes. To do this, we will consider the variable `quality` as a continuous variable ranging from 0 to 10. It is worth noting, however, that this variable is originally a categorical one which can only take one of the 11 integer values comprised between 0 and 10. Therefore, as predictions will be continuous, many of them will most likely be slightly off due to this discrepancy. This should not pose a problem,  as the usual error metrics, such as RMSE, can be obtained anyways.
+
+
+\subsection{Model fitting}
+After splitting the data in training and test sets, the training set was used to fit a linear regression model. At first, all variables were used as explanatory variables for the model:
+
+\begin{equation*}
+\begin{aligned}	
+(7) \ \ \ \  \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \hat{y} = \beta_0 + \beta_1*fixed\_acidity + \beta_2*volatile\_acidity 
++ \beta_3*citic\_acid  \\ +\beta_4*residual\_sugar 
++ \ \beta_5*chlorides\\ + \beta_6*free\_sulfur\_dioxide  \\+ \ \beta_7*total\_sulfur\_dioxide   
+\\ + \ \beta_8*density + \beta_9*pH  \\+ \ \beta_{10}*sulphates + \beta_{11}*alcohol 	
+\end{aligned}
+\end{equation*}
+
+However, the marginal coefficient test for each of the variables indicates that the $p$-values for citric acid and chlorides are not low enough to reject the null hypothesis. Thus, we can consider that the contribution of these to the variance of quality is not significantly greater than 0, and so they have been removed from the final model. The resulting linear regression model is described below:
+
+\begin{equation*}
+\begin{aligned}	
+(8) \ \ \ \  \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \  \hat{y} = 59.58 + 0.0616*fixed\_acidity  -1.275*volatile\_acidity 
++0.04318*residual\_sugar \\
++ \  0.00618*free\_sulfur\_dioxide  - \ 0.00257*total\_sulfur\_dioxide   
+\\ - \ 0.5899*density  + \ 0.5068*pH   \\+ 0.7161*sulphates + 0.2637*alcohol
+\end{aligned}
+\end{equation*}
+
+According to the obtained model, the two variables with the highest influence on quality are `volatile acidity` and `density`, specially the latter. This can be misleading however, as it represents the variation in quality per unit of the input, and the scales of the input variables differ in their order of magnitude. Checking the distribution of $density$, for example, the difference between the maximum and minimum values is lower than 0.03, whereas $total\_sulfur\_dioxide$ has a range of over 400. In any case, some conclusions can be extracted from this output. For example, denser wines tend to have a smaller perceived quality due to the negative coefficient, and, on the contrary, those with higher alcohol contents obtain highger quality perception.
+
+\paragraph*{}
+The adjusted R-squared coefficient of the resulting model is rather low, with a value of only 0.29. The regression overall $p$-value, however, is low enough for us to be confident that there exists a relationship between at least part of the input and the output variable, $quality$, performing better than just the simple constant model.
+
+\subsection{Assessing the model: assumptions}
+
+\paragraph*{}
+Let us further examine the quality of the linear regression model by checking if the assumptions are met. In particular, we are interested in testing the linearity of the model and if the residuals are independent, normal and have constant variance (LINE conditions).
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=5in]{figures/qqplot.png}
+	\caption{Plot diagnostics for the linear regression model} 
+	\label{figure:qqplot}
+\end{figure}
+
+\paragraph*{}
+The conducted tests have different results. First of all, the Rainbow test tests the linear relationship between the response and the linear predictor. The $p$-value is high enough to not reject the null hypothesis (0.4325) but in other datasets this value is close to 1. On the other hand, the Durbin-Watson test returns a high $p$-value (0.7377), sign that there is not enough evidence to reject the null hypothesis of autocorrelation of the residuals. Hence, the residuals can be considered as independent. The results for the Jarque-Bera and Breusch-Pagan tests, however, are not so positive. According to their results, residuals are neither normal nor homoscedastic.
+
+\paragraph*{}
+Although the residual plots of Figure \ref{figure:qqplot} are unusual due to the clustering around the integer values, they confirm the previous results. The Normal Q-Q plot is in line with the results of the Jarque-Bera test, showing departures from normality, specially in the first quartiles. From the Cook's distance plot, a significant outlier can be seen, corresponding to observation 4446. Even if we remove this outlier, the statistical assumptions remain the same.
 \end{document}
 
 
