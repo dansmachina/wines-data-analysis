@@ -137,15 +137,15 @@ An attempt to use linear regression to predict wine quality.
 
 \section{Introduction}\label{introduction}
 
-The aim of this section is to use linear regression to try and predict a
-wine's quality based on its chemical attributes. To do this, we will
-consider quality as a continuous variable ranging from 0 to 10. It is
-worth noting, however, that this variable is in fact a categorical one
-which can only take one of the 11 integer values comprised between 0 and
-10. Therefore, as predictions will be continuous, many of them will most
-likely be slightly off due to this discrepancy. This should not pose a
-problem, however, as the usual error metrics, such as RMSE, can be
-obtained anyways.
+The aim of this section is to use linear regression to model and predict
+a wine's quality based on its physicochemical attributes. To do this, we
+will consider the variable \texttt{quality} as a continuous variable
+ranging from 0 to 10. It is worth noting, however, that this variable is
+originally a categorical one which can only take one of the 11 integer
+values comprised between 0 and 10. Therefore, as predictions will be
+continuous, many of them will most likely be slightly off due to this
+discrepancy. This should not pose a problem, as the usual error metrics,
+such as RMSE, can be obtained anyways.
 
 \section{Model fitting}\label{model-fitting}
 
@@ -288,20 +288,23 @@ final model. The resulting linear regression model is described below.
 \end{verbatim}
 
 According to the obtained model, the two variables with the highest
-influence on quality are volatile acidity and density, specially the
-latter. This can be misleading however, as it represents the variation
-in quality per unit of the input, and the scales of the input variables
-differ in their order of magnitude. Checking the distribution of
-\(density\), for example, the difference between the maximum and minimun
-values is lower than 0.03, whereas \(total_sulfur_dioxide\) has a range
-of over 400. In any case, some conclusions can be extracted from this
-output. For example, denser wines tend to have a higher perceived
-quality, and the same happens to those with higher alcohol contents.
+influence on quality are \texttt{volatile\ acidity} and
+\texttt{density}, specially the latter. This can be misleading however,
+as it represents the variation in quality per unit of the input, and the
+scales of the input variables differ in their order of magnitude.
+Checking the distribution of \(density\), for example, the difference
+between the maximum and minimun values is lower than 0.03, whereas
+\(total_sulfur_dioxide\) has a range of over 400. In any case, some
+conclusions can be extracted from this output. For example, denser wines
+tend to have a smaller perceived quality due to the negative
+coefficient, and, on the contrary, those with higher alcohol contents
+obtain highger quality perception.
 
 The adjusted R-squared coefficient of the resulting model is rather low,
-with a value of only 0.29. Its associated p-value, however, is low
-enough for us to be confident that there exists a relationship between
-at least part of the input and the output variable, \(quality\).
+with a value of only 0.29. The regression overall \(p\)-value, however,
+is low enough for us to be confident that there exists a relationship
+between at least part of the input and the output variable, \(quality\),
+performing better than just the simple constant model.
 
 \section{Assessing the model:
 assumptions}\label{assessing-the-model-assumptions}
@@ -314,6 +317,21 @@ variance.
 \begin{Shaded}
 \begin{Highlighting}[]
 \CommentTok{# A: Check the assumptions}
+\CommentTok{# Linearity}
+\KeywordTok{raintest}\NormalTok{(model1) }\CommentTok{# Yes, linear}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+##  Rainbow test
+## 
+## data:  model1
+## Rain = 1.0067, df1 = 2598, df2 = 2588, p-value = 0.4325
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
 \CommentTok{# Test normality}
 \KeywordTok{jarque.bera.test}\NormalTok{(}\KeywordTok{residuals}\NormalTok{(model1)) }\CommentTok{# Answer: No normality}
 \end{Highlighting}
@@ -345,24 +363,29 @@ variance.
 \begin{Shaded}
 \begin{Highlighting}[]
 \CommentTok{# Testing independence of the residuals}
-\KeywordTok{Box.test}\NormalTok{(}\KeywordTok{residuals}\NormalTok{(model1)) }\CommentTok{# Independent}
+\KeywordTok{dwtest}\NormalTok{(model1, }\DataTypeTok{alternative=}\StringTok{"two.sided"}\NormalTok{) }\CommentTok{# Not independent}
 \end{Highlighting}
 \end{Shaded}
 
 \begin{verbatim}
 ## 
-##  Box-Pierce test
+##  Durbin-Watson test
 ## 
-## data:  residuals(model1)
-## X-squared = 0.1241, df = 1, p-value = 0.7246
+## data:  model1
+## DW = 2.0093, p-value = 0.7377
+## alternative hypothesis: true autocorrelation is not 0
 \end{verbatim}
 
-The conducted tests have different results. On the one hand, the
-Box-Pierce test returns a high p-value, sign that there is not enough
-evidence to reject the null hypothesis of independence. The results for
-the Jarque-Bera and Breusch-Pagan tests, on the other hand, are not so
-positive. According to their results, residuals are neither normal nor
-homoscedastic.
+The conducted tests have different results. First of all, the Rainbow
+test tests the linear relationship between the response and the linear
+predictor. The \(p\)-value is high enough to not reject the null
+hypothesis (0.4325) but in other datasets this value is close to 1. On
+the other hand, the Durbin-Watson test returns a high \(p\)-value
+(0.7377), sign that there is not enough evidence to reject the null
+hypothesis of autocorrelation of the residuals. Hence, the residuals can
+be considered as independent. The results for the Jarque-Bera and
+Breusch-Pagan tests, however, are not so positive. According to their
+results, residuals are neither normal nor homoscedastic.
 
 \begin{figure}
 
@@ -378,75 +401,242 @@ integer values, they confirm the previous results. The Normal Q-Q plot
 is in line with the results of the Jarque-Bera test, showing departures
 from normality, specially in the first quartiles. From the Cook's
 distance plot, a significant outlier can be seen, corresponding to
-observation 4446.
+observation 4446. Even if we remove this outlier, the statistical
+assumptions remain the same.
 
 \section{Evaluation of results}\label{evaluation-of-results}
 
-\begin{Shaded}
-\begin{Highlighting}[]
-\CommentTok{# Residuals}
-\KeywordTok{par}\NormalTok{(}\DataTypeTok{mfrow=}\KeywordTok{c}\NormalTok{(}\DecValTok{2}\NormalTok{,}\DecValTok{2}\NormalTok{))}
-\KeywordTok{plot}\NormalTok{(model1, }\DataTypeTok{which=}\KeywordTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{:}\DecValTok{4}\NormalTok{), }\DataTypeTok{ask=}\NormalTok{F)}
-\end{Highlighting}
-\end{Shaded}
-
-\includegraphics{quality-regression_files/figure-latex/evaluation-1.pdf}
+The final step is to evaluate the performance of the model. In order to
+do so, let us measure the accuracy of predictions by calculating the
+value of our error metric of choice: RMSE. The standard deviation of our
+data will be used as a reference to assess the correctness of RMSE
+values.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\CommentTok{# Un ojo a ese outlier gigante}
-
-\CommentTok{# Conclusiones: en cuanto a hipotesis nuestro modelo es bastante mierda. Ademas parece que esta bien}
-\CommentTok{# para qualitys entre 4 y 6 mas o menos, los valores mas grandes van mal. Esto es normal porque la}
-\CommentTok{# muestra que tenemos es bastante mala (hacer histograma)}
-
-\CommentTok{# 2. Assess the model. B: Evaluate performance}
-\NormalTok{predicted <-}\StringTok{ }\KeywordTok{predict}\NormalTok{(model1, test)}
-
-\CommentTok{# Percentage of correct predictions aka accuracy (we are rounding the predicted variable)}
-\CommentTok{# Around 50% are correct - not bad}
-\KeywordTok{sum}\NormalTok{(test$quality ==}\StringTok{ }\KeywordTok{round}\NormalTok{(predicted))/}\KeywordTok{nrow}\NormalTok{(test)}
+\CommentTok{# Standard deviation of our data}
+\KeywordTok{sd}\NormalTok{(df$quality)}
 \end{Highlighting}
 \end{Shaded}
 
 \begin{verbatim}
-## [1] 0.5146154
+## [1] 0.8732716
 \end{verbatim}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\CommentTok{# But the above is a simplification, we are treating quality as a continuous var, so lets check}
-\CommentTok{# more conventional metrics, in this case rmse}
-\NormalTok{rmse <-}\StringTok{ }\NormalTok{(}\KeywordTok{sqrt}\NormalTok{(}\KeywordTok{mean}\NormalTok{(test$quality -}\StringTok{ }\NormalTok{predicted)^}\DecValTok{2}\NormalTok{))}
+\CommentTok{# 2. Assess the model. B: Evaluate performance}
+\NormalTok{predicted <-}\StringTok{ }\KeywordTok{predict}\NormalTok{(model1, test)}
+\NormalTok{rmse <-}\StringTok{ }\NormalTok{(}\KeywordTok{sqrt}\NormalTok{(}\KeywordTok{mean}\NormalTok{((test$quality -}\StringTok{ }\NormalTok{predicted)^}\DecValTok{2}\NormalTok{)))}
 \NormalTok{rmse}
 \end{Highlighting}
 \end{Shaded}
 
 \begin{verbatim}
-## [1] 0.006010179
+## [1] 0.7426711
 \end{verbatim}
+
+As the results above show, our predicted variable \(quality\) has a
+standard deviation of \(\sigma = 0.87\). When fed with the test set, the
+linear regression model outputs predictions with an \(RMSE = 0.74\).
+Therefore, and in line with what has been stated before, the
+interpretation of these results is positive, as RMSE is lower than the
+data's standard deviation.
+
+\subsection{Alternative model based on the sweetness of
+wines}\label{alternative-model-based-on-the-sweetness-of-wines}
+
+We can try to improve the validation and interpretation of the model by
+defininig a new categorical variable, \(residual_sugar2\), which divides
+wines in three groups according on their sweetness{[}1{]}. The sweetness
+of the wines is defined by its residual sugar, and commonly the
+classification is \texttt{dry} wines for values up to 4 g/l,
+\texttt{medium\_dry} up to 12 g/l, \texttt{medium} up to 45 g/l and
+\texttt{sweet} more than 45 g/l. In out dataset, the highest value for
+\texttt{residual\_sugar} is 18, thus we only consider the first three
+clusters.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\CommentTok{# Pseudo rmse (after discretizing the output var by rounding)}
-\CommentTok{# Aumenta bastante, pero ahora - yo diria - es una cifra mas indicativa}
-\NormalTok{rmse.discret <-}\StringTok{ }\NormalTok{(}\KeywordTok{sqrt}\NormalTok{(}\KeywordTok{mean}\NormalTok{((test$quality -}\StringTok{ }\KeywordTok{round}\NormalTok{(predicted))^}\DecValTok{2}\NormalTok{)))}
-\NormalTok{rmse.discret}
+\CommentTok{# Adding the new attribute}
+\NormalTok{df$residual_sugar2 <-}\StringTok{ }\NormalTok{df$residual_sugar}
+\NormalTok{df$residual_sugar2[df$residual_sugar <}\StringTok{ }\FloatTok{4.0}\NormalTok{] <-}\StringTok{ "dry"}
+\NormalTok{df$residual_sugar2[df$residual_sugar >=}\StringTok{ }\FloatTok{4.0} \NormalTok{&}\StringTok{ }\NormalTok{df$residual_sugar <}\StringTok{ }\FloatTok{12.0}\NormalTok{] <-}\StringTok{ "medium dry"}
+\NormalTok{df$residual_sugar2[df$residual_sugar >=}\StringTok{ }\FloatTok{12.0}\NormalTok{] <-}\StringTok{ "medium"}
+
+\NormalTok{df$residual_sugar2 =}\StringTok{ }\KeywordTok{as.factor}\NormalTok{(df$residual_sugar2)}
+\NormalTok{df$residual_sugar2=}\KeywordTok{relevel}\NormalTok{(df$residual_sugar2, }\DataTypeTok{ref=}\StringTok{"dry"}\NormalTok{)}
+
+\CommentTok{# Update train and test sets }
+\NormalTok{train =}\StringTok{ }\NormalTok{df[}\DecValTok{1}\NormalTok{:split,]}
+\NormalTok{test =}\StringTok{ }\NormalTok{df[split:}\KeywordTok{nrow}\NormalTok{(df),]}
+
+\NormalTok{model2 =}\StringTok{ }\KeywordTok{update}\NormalTok{(model1, ~.+residual_sugar2+residual_sugar:residual_sugar2)}
+\KeywordTok{summary}\NormalTok{(model2)}
 \end{Highlighting}
 \end{Shaded}
 
 \begin{verbatim}
-## [1] 0.8133501
+## 
+## Call:
+## lm(formula = quality ~ fixed_acidity + volatile_acidity + residual_sugar + 
+##     free_sulfur_dioxide + total_sulfur_dioxide + density + pH + 
+##     sulphates + alcohol + residual_sugar2 + residual_sugar:residual_sugar2, 
+##     data = train)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -3.8172 -0.4577 -0.0354  0.4526  2.6725 
+## 
+## Coefficients:
+##                                            Estimate Std. Error t value
+## (Intercept)                               6.881e+01  1.387e+01   4.962
+## fixed_acidity                             6.448e-02  1.725e-02   3.738
+## volatile_acidity                         -1.311e+00  7.870e-02 -16.663
+## residual_sugar                            1.519e-01  2.304e-02   6.591
+## free_sulfur_dioxide                       5.922e-03  8.407e-04   7.044
+## total_sulfur_dioxide                     -2.612e-03  3.065e-04  -8.523
+## density                                  -6.835e+01  1.413e+01  -4.837
+## pH                                        5.272e-01  1.004e-01   5.253
+## sulphates                                 7.053e-01  8.240e-02   8.560
+## alcohol                                   2.448e-01  1.998e-02  12.249
+## residual_sugar2medium                     8.122e-01  1.818e-01   4.467
+## residual_sugar2medium dry                 3.532e-01  7.809e-02   4.523
+## residual_sugar:residual_sugar2medium     -1.451e-01  2.459e-02  -5.900
+## residual_sugar:residual_sugar2medium dry -1.265e-01  2.349e-02  -5.387
+##                                          Pr(>|t|)    
+## (Intercept)                              7.20e-07 ***
+## fixed_acidity                            0.000187 ***
+## volatile_acidity                          < 2e-16 ***
+## residual_sugar                           4.80e-11 ***
+## free_sulfur_dioxide                      2.11e-12 ***
+## total_sulfur_dioxide                      < 2e-16 ***
+## density                                  1.36e-06 ***
+## pH                                       1.55e-07 ***
+## sulphates                                 < 2e-16 ***
+## alcohol                                   < 2e-16 ***
+## residual_sugar2medium                    8.11e-06 ***
+## residual_sugar2medium dry                6.24e-06 ***
+## residual_sugar:residual_sugar2medium     3.87e-09 ***
+## residual_sugar:residual_sugar2medium dry 7.49e-08 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 0.7312 on 5182 degrees of freedom
+## Multiple R-squared:  0.2969, Adjusted R-squared:  0.2952 
+## F-statistic: 168.4 on 13 and 5182 DF,  p-value: < 2.2e-16
 \end{verbatim}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\CommentTok{# Conclusiones: No funciona mal en cuanto a resultados, pero no nos fiamos, entre que los}
-\CommentTok{# datos son malillos (en cuanto a distribucion) y que no hemos usado la tecnica adecuada (ver abajo)}
-\CommentTok{# En cualquier caso, posiblemente seria mejor usar Logistic Regression (o algun metodo de clasificacion)}
-\CommentTok{# para predecir la quality, que realmente no es continua.}
+\CommentTok{# Test linearity}
+\KeywordTok{raintest}\NormalTok{(model2) }\CommentTok{# Yes, linear}
 \end{Highlighting}
 \end{Shaded}
+
+\begin{verbatim}
+## 
+##  Rainbow test
+## 
+## data:  model2
+## Rain = 1.0076, df1 = 2598, df2 = 2584, p-value = 0.4236
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# Test normality}
+\KeywordTok{jarque.bera.test}\NormalTok{(}\KeywordTok{residuals}\NormalTok{(model2)) }\CommentTok{# Answer: No normality}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+##  Jarque Bera Test
+## 
+## data:  residuals(model2)
+## X-squared = 289.9, df = 2, p-value < 2.2e-16
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# Equal variances}
+\KeywordTok{bptest}\NormalTok{(model2) }\CommentTok{# No constant variance}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+##  studentized Breusch-Pagan test
+## 
+## data:  model2
+## BP = 93.627, df = 13, p-value = 2.818e-14
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# Testing independence of the residuals}
+\KeywordTok{dwtest}\NormalTok{(model2, }\DataTypeTok{alternative=}\StringTok{"two.sided"}\NormalTok{) }\CommentTok{# Not independent}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+##  Durbin-Watson test
+## 
+## data:  model2
+## DW = 2.0065, p-value = 0.8158
+## alternative hypothesis: true autocorrelation is not 0
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# 2. Assess the model. B: Evaluate performance}
+\NormalTok{predicted2 <-}\StringTok{ }\KeywordTok{predict}\NormalTok{(model2, test)}
+\NormalTok{rmse <-}\StringTok{ }\NormalTok{(}\KeywordTok{sqrt}\NormalTok{(}\KeywordTok{mean}\NormalTok{((test$quality -}\StringTok{ }\NormalTok{predicted2)^}\DecValTok{2}\NormalTok{)))}
+\NormalTok{rmse}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 0.74352
+\end{verbatim}
+
+In comparison with the previous model, the R-squared coeffient has
+improved slightly. The model's assumptions, however, remain the same:
+residuals are linear, but they are not normal and their variance is
+still not constant either. RMSE does not change significantly, differing
+in less than 0.01 from the previous measure.
+
+Overall, the improvement in R-squared does not justify the effort to
+include a new attribute, as a) it is very slight, b) the model's
+assumptions are still not met, and c) RMSE has not improved as a
+consequence of it. It is true, however, that by looking at the
+coefficients, some information can be derived about the impact of
+sweetness on quality. Specifically, medium wines seem to have higher
+quality rankings than medium-dry ones, which in turn are ranked better
+than dry wines.
+
+\section{Conclusions}\label{conclusions}
+
+According to evaluation results, the model has a rather good performance
+at predicting wine quality. Even though the it does not have a very high
+R-squared coefficient, the RMSE metric is low enough for us to consider
+it an interesting option to predict a wine's quality. Some remarks can
+be made, however. First of all, our input data is not uniformly
+distributed, with a majority of the observations taking quality values
+between 4 and 6. Thus, our model could be slightly overfitted for those
+kind of values, and there is a risk that the precision of results could
+drop if the input data happened to contain more extreme values.
+
+Besides, it would be interesting to try a different approach to this
+problem, perhaps using a classification technique for prediction
+instead, although linear regression seems better suited given the
+features of the output variable.
+
+\section{Bibliography}\label{bibliography}
+
+{[}1{]} Terms used to indicate sweetness of wine.
+\url{https://en.wikipedia.org/wiki/Sweetness_of_wine\#Residual_sugar}
 
 
 \end{document}

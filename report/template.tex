@@ -219,7 +219,7 @@ Let us start with the simplest model: the constant model. Since we know that the
 A bit more than 75\% of accuracy just by guessing that all the wines will be red. However, we are not using the chemical information. Let us now include one of the variables to the logistic model. Which one? The one which decreases the most the AIC. The AIC is a measure of the quality of different models, relative to each of the other models. Ideal for model selection.
 
 \paragraph*{}
-The function `step` does this task for us: it chooses a model by AIC in a stepwise algorithm. We would use it in the forward direction: tt starts by the simplest constant model, and it tries to achieve the best model up to the full model, previously defined. Since we will go step by step, we will set the number of `steps` manually, to see what happens in each level.
+The function `step` in R does this task for us: it chooses a model by AIC in a stepwise algorithm. We would use it in the forward direction: tt starts by the simplest constant model, and it tries to achieve the best model up to the full model, previously defined. Since we will go step by step, we will set the number of `steps` manually, to see what happens in each level.
 
 \begin{table}[H]
 	\centering
@@ -291,7 +291,7 @@ We stop here, since the addition of more variables does not significantly increa
 We can detect in Figure \ref{figure:accuracy-model} that using just 5 variables in the logistic regression mode we achieve the same accuracy (99\%) than using all the 9 variables from the full model (2), getting this final model:
 \begin{equation*}
 \begin{aligned}	
-(6) \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \  \   logit(\hat{y}) = -1.945e^{3}  -4.375e^{-2}*total\_sulfur\_dioxide + 1.937e^{3}*density \\ \  -7.818e^{-1}*residual\_sugar \\  + \ 2.065*alcohol \\ + \ 7.016*volatile\_acidity
+(6) \ \ \ \ \ \ \ \ \ \ \ \ \ \  \ \ \ \ \ \ \ \ \ \ \ \ \ \  \   logit(\hat{y}) = -1.945e^{3}  -4.375e^{-2}*total\_sulfur\_dioxide + 1.937e^{3}*density \\ \  -7.818e^{-1}*residual\_sugar \\  + \ 2.065*alcohol \\ + \ 7.016*volatile\_acidity
 \end{aligned}
 \end{equation*}	
 
@@ -329,7 +329,7 @@ After splitting the data in training and test sets, the training set was used to
 
 \begin{equation*}
 \begin{aligned}	
-(7) \ \ \ \  \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \hat{y} = \beta_0 + \beta_1*fixed\_acidity + \beta_2*volatile\_acidity 
+(7) \ \ \ \ \ \ \  \ \ \ \ \ \  \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \hat{y} = \beta_0 + \beta_1*fixed\_acidity + \beta_2*volatile\_acidity 
 + \beta_3*citic\_acid  \\ +\beta_4*residual\_sugar 
 + \ \beta_5*chlorides\\ + \beta_6*free\_sulfur\_dioxide  \\+ \ \beta_7*total\_sulfur\_dioxide   
 \\ + \ \beta_8*density + \beta_9*pH  \\+ \ \beta_{10}*sulphates + \beta_{11}*alcohol 	
@@ -340,7 +340,7 @@ However, the marginal coefficient test for each of the variables indicates that 
 
 \begin{equation*}
 \begin{aligned}	
-(8) \ \ \ \  \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \  \hat{y} = 59.58 + 0.0616*fixed\_acidity  -1.275*volatile\_acidity 
+(8) \ \ \ \  \ \  \ \ \  \hat{y} = 59.58 + 0.0616*fixed\_acidity  -1.275*volatile\_acidity 
 +0.04318*residual\_sugar \\
 + \  0.00618*free\_sulfur\_dioxide  - \ 0.00257*total\_sulfur\_dioxide   
 \\ - \ 0.5899*density  + \ 0.5068*pH   \\+ 0.7161*sulphates + 0.2637*alcohol
@@ -369,6 +369,63 @@ The conducted tests have different results. First of all, the Rainbow test tests
 
 \paragraph*{}
 Although the residual plots of Figure \ref{figure:qqplot} are unusual due to the clustering around the integer values, they confirm the previous results. The Normal Q-Q plot is in line with the results of the Jarque-Bera test, showing departures from normality, specially in the first quartiles. From the Cook's distance plot, a significant outlier can be seen, corresponding to observation 4446. Even if we remove this outlier, the statistical assumptions remain the same.
+
+\subsection{Alternative model based on the sweetness of wines}
+
+\paragraph*{}
+We can try to improve the validation and interpretation of the model by defining a new categorical variable, `residual\_sugar2`, which divides wines in three groups according on their sweetness \footnote{Terms used to indicate sweetness of wine: https://en.wikipedia.org/wiki/Sweetness\_of\_wine\#Residual\_sugar}. The sweetness of the wines is defined by its residual sugar, and commonly the classification is `dry` wines for values up to 4 g/l, `medium\_dry` up to 12 g/l,  `medium` up to 45 g/l and `sweet` more than 45 g/l. In out dataset, the highest value for `residual\_sugar` is 18, thus we only consider the first three clusters:
+
+\begin{equation*}
+\begin{aligned}	
+(9) \ \ \ \  \ \ \ \ \ \ \ \ \ \  \hat{y} = 68.81 + 0.064*fixed\_acidity  -1.311*volatile\_acidity 
++0.152*residual\_sugar \\
++ \  0.0059*free\_sulfur\_dioxide  - \ 0.00261*total\_sulfur\_dioxide   
+\\ - \ 0.683*density  + \ 0.5272*pH   + 0.7053sulphates + 0.2448*alcohol \\
++ \ 0.0812 * residual\_sugar2medium + 0.353 * residual\_sugar2medium\_dry \\
+- \ 0.145 * residual\_sugar*residual\_sugar2medium \\
+- \ 0.126 * residual\_sugar*residual\_sugar2medium\_dry
+\end{aligned}
+\end{equation*}
+
+
+\paragraph*{}
+In comparison with the previous model, the R-squared coefficient has improved slightly (0.2969). The model's assumptions, however, remain the same: residuals are linear, but they are not normal and their variance is still not constant either. RMSE does not change significantly, differing in less than 0.01 from the previous measure. 
+
+\paragraph*{}
+Overall, the improvement in R-squared does not justify the effort to include a new attribute, as a) it is very slight, b) the model's assumptions are still not met, and c) RMSE has not considerably improved as a consequence of it. It is true, however, that by looking at the coefficients, some information can be derived about the impact of sweetness on quality. Specifically, medium wines seem to have higher quality rankings than medium-dry ones, which in turn are ranked better than dry wines. 
+
+\subsection{Evaluation}
+
+\paragraph*{}
+The final step is to evaluate the performance of the model. In order to do so, let us measure the accuracy of predictions by calculating the value of our error metric of choice: RMSE. The standard deviation of our data will be used as a reference to assess the correctness of RMSE values.
+
+\begin{table}[H]
+	\centering
+	
+	\begin{tabular}{|c|c|}
+		\hline
+		& \textbf{RMSE} \\ \hline
+		\textbf{standard deviation} & 0.8732        \\ \hline
+		\textbf{Model 1}            & 0.7426         \\ \hline
+		\textbf{Model 2 (sweetness)}            & 0.7325         \\ \hline
+	\end{tabular}
+	\caption{RMSE error of the linear regression models}
+	\label{rmsel}
+\end{table}
+
+
+As the results above show, our predicted variable quality has a standard deviation of $\sigma = 0.87$. When fed with the test set, the linear regression model outputs predictions with an
+RMSE of 0.7426 for Model 1 and 0.7325 for Model 2. Therefore, and in line with what has been stated before, the interpretation of these results is positive, as RMSE is lower than the data’s standard deviation.
+
+\subsection{Conclusion}
+
+\paragraph*{}
+According to evaluation results, the model has a rather good performance at predicting wine quality. Even though the it does not have a very high R-squared coefficient, the RMSE metric is low enough for us to consider it an interesting option to predict a wine's quality. Some remarks can be made, however. First of all, our input data is not uniformly distributed, with a majority of the observations taking quality values between 4 and 6. Thus, our model could be slightly overfitted for those kind of values, and there is a risk that the precision of results could drop if the input data happened to contain more extreme values. 
+
+\paragraph*{}
+Besides, it would be interesting to try a different approach to this problem, perhaps using a classification technique for prediction instead, although linear regression seems better suited given the features of the output variable. 
+
+
 \end{document}
 
 
