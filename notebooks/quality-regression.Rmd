@@ -100,9 +100,40 @@ plot(model1, which=c(1:4), ask=F)
 
 Although the residual plots are unusual due to the clustering around the integer values, they confirm the previous results. The Normal Q-Q plot is in line with the results of the Jarque-Bera test, showing departures from normality, specially in the first quartiles. From the Cook's distance plot, a significant outlier can be seen, corresponding to observation 4446. Even if we remove this outlier, the statistical assumptions remain the same.
 
-## Model based on the sweetness of wines
+# Evaluation of results
 
-We can try to improve the validation and interpretation of the model by defininig a new categorical variable, `residual_sugar2', which divides wines in three groups according on their sweetness[1]. The sweetness of the wines is defined by its residual sugar, and commonly the classification is `dry` wines for values up to 4 g/l, `medium_dry` up to 12 g/l,  `medium` up to 45 g/l and `sweet` more than 45 g/l. In out dataset, the highest value for `residual_sugar` is 18, this we only consider the first three clusters.
+The final step is to evaluate the performance of the model. In order to do so, let us measure the accuracy of predictions by calculating the value of our error metric of choice: RMSE. The standard deviation of our data will be used as a reference to assess the correctness of RMSE values.
+
+```{r evaluation, message=FALSE, warning=FALSE}
+# Standard deviation of our data
+sd(df$quality)
+
+# 2. Assess the model. B: Evaluate performance
+predicted <- predict(model1, test)
+
+# Percentage of correct predictions aka accuracy (we are rounding the predicted variable)
+# Around 50% are correct - not bad
+sum(test$quality == round(predicted))/nrow(test)
+
+# But the above is a simplification, we are treating quality as a continuous var, so lets check
+# more conventional metrics, in this case rmse
+rmse <- (sqrt(mean((test$quality - predicted)^2)))
+rmse
+```
+
+As the results above show, our predicted variable $quality$ has a standard deviation of $\sigma = 0.87$. When fed with the test set, the linear regression model outputs predictions with an $RMSE = 0.74$. Therefore, and in line with what has been stated before, the interpretation of these results is positive, as RMSE is lower than the data's standard deviation.  
+
+```{r evaluation_2, message=FALSE, warning=FALSE, include=FALSE}
+
+# Pseudo rmse (after discretizing the output var by rounding)
+# Aumenta bastante, pero ahora - yo diria - es una cifra mas indicativa
+rmse.discrete <- (sqrt(mean((test$quality - round(predicted))^2)))
+rmse.discrete
+```
+
+## Alternative model based on the sweetness of wines
+
+We can try to improve the validation and interpretation of the model by defininig a new categorical variable, $residual_sugar2$, which divides wines in three groups according on their sweetness[1]. The sweetness of the wines is defined by its residual sugar, and commonly the classification is `dry` wines for values up to 4 g/l, `medium_dry` up to 12 g/l,  `medium` up to 45 g/l and `sweet` more than 45 g/l. In out dataset, the highest value for `residual_sugar` is 18, thus we only consider the first three clusters.
 
 ```{r sweetness}
 train$residual_sugar2 <- train$residual_sugar
@@ -129,42 +160,12 @@ dwtest(model2, alternative="two.sided") # Not independent
 
 TODO: Mejora un poco el Multiple-R square, aunque siguen igual las hipotesis. Se puede ver que los medium vinos estan mejor valorados que los medium dry, y a su vez estos dos mejores que los dry (reference). No hacer qqplot aqui, ya lo hemos hecho arriba.
 
+# Conclusions 
 
-# Evaluation of results
+According to evaluation results, the model has a rather good performance at predicting wine quality. Even though the it does not have a very high R-squared coefficient, the RMSE metric is low enough for us to consider it an interesting option to predict a wine's quality. Some remarks can be made, however. First of all, our input data is not uniformly distributed, with a majority of the observations taking quality values between 4 and 6. Thus, our model could be slightly overfitted for those kind of values, and there is a risk that the precision of results could drop if the input data happened to contain more extreme values. 
 
-```{r evaluation, message=FALSE, warning=FALSE}
-# Residuals
-par(mfrow=c(2,2))
-plot(model1, which=c(1:4), ask=F)
+Besides, it would be interesting to try a different approach to this problem, perhaps using a classification technique for prediction instead, although linear regression seems better suited given the features of the output variable. 
 
-# Un ojo a ese outlier gigante
-
-# Conclusiones: en cuanto a hipotesis nuestro modelo es bastante mierda. Ademas parece que esta bien
-# para qualitys entre 4 y 6 mas o menos, los valores mas grandes van mal. Esto es normal porque la
-# muestra que tenemos es bastante mala (hacer histograma)
-
-# 2. Assess the model. B: Evaluate performance
-predicted <- predict(model1, test)
-
-# Percentage of correct predictions aka accuracy (we are rounding the predicted variable)
-# Around 50% are correct - not bad
-sum(test$quality == round(predicted))/nrow(test)
-
-# But the above is a simplification, we are treating quality as a continuous var, so lets check
-# more conventional metrics, in this case rmse
-rmse <- (sqrt(mean(test$quality - predicted)^2))
-rmse
-
-# Pseudo rmse (after discretizing the output var by rounding)
-# Aumenta bastante, pero ahora - yo diria - es una cifra mas indicativa
-rmse.discret <- (sqrt(mean((test$quality - round(predicted))^2)))
-rmse.discret
-
-# Conclusiones: No funciona mal en cuanto a resultados, pero no nos fiamos, entre que los
-# datos son malillos (en cuanto a distribucion) y que no hemos usado la tecnica adecuada (ver abajo)
-# En cualquier caso, posiblemente seria mejor usar Logistic Regression (o algun metodo de clasificacion)
-# para predecir la quality, que realmente no es continua.
-```
 
 # Bibliography
 
