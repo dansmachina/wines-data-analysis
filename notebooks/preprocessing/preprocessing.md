@@ -1,32 +1,30 @@
----
-title: "Data Understanding and Preparation"
-output: rmarkdown::github_document
----
+Data Understanding and Preparation
+================
 
-```{r setup, include=FALSE}
-library(readr)
-knitr::opts_chunk$set(echo = TRUE)
-```
-
-## Introduction
+Introduction
+------------
 
 Explain which original datasets we have, attributes description, number of variables, number of observations...
 
-## Data Exploratory Analysis
+Data Exploratory Analysis
+-------------------------
 
 Maybe some plots here about the distribution of some of the variables... we'll see. I suggest to follow the same points than in the homework scripts.
 
-## Preprocessing
+Preprocessing
+-------------
 
 Loading the datasets.
-```{r load, message=FALSE, warning=FALSE}
+
+``` r
 # Load individual datasets
 white <- read_delim("../../data/raw/winequality-white.csv",";", escape_double = FALSE, trim_ws = TRUE)
 red <- read_delim("../../data/raw/winequality-red.csv",";", escape_double = FALSE, trim_ws = TRUE)
 ```
 
 Prepare the dataset in order to create a new dataset
-```{r preparation}
+
+``` r
 # Create a new column, where 0 indicates white wine and 1 red wine.
 white$type = 0
 red$type = 1
@@ -46,7 +44,8 @@ df$type <- as.factor(df$type)
 ```
 
 Remove missing values and shuffle the dataset.
-```{r manipulation}
+
+``` r
 # Remove missing values.
 df <- df[complete.cases(df), ] # two entries.
 

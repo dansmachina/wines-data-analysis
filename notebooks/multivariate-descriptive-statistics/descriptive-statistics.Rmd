@@ -1,141 +1,137 @@
 ---
-title: "Multivariate Descriptive Statistics"
-output:
-  pdf_document: default
-  html_notebook: default
-header-includes:
- - \usepackage{booktabs}
- - \usepackage{graphicx}
-  
+title: "Wines quality and classification - Multivariate Descriptive Statistics"
+output: rmarkdown::github_document
 ---
 
-```{r setup, include=FALSE}
+```{r setup, echo = FALSE, message=FALSE, warning=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+# Introduction
+
+The dataset to analyze is composed of the red and white variants of the Portuguese "Vinho verde" wine. In total, there are 6495 different instances of wines, where 4898 are white wine and 1597 red wine. On the other hand, the dataset has 12 variables based on physicochemical tests on different wines plus two categorical variables, one for grading the wine quality by experts between 0 (very bad) and 10 (very excellent) and another binary variable, 0 = white wine and 1 = red wine. The goal of this project is a) to predict the quality of a wine and b) to classify whether a new wine is red or white, given its attributes.
+
+# Preprocessing 
+
+The [original](https://archive.ics.uci.edu/ml/datasets/Wine+Quality) datasets consist of two separated files, one for white wines and another for red wines. In this first step, we will combine them into a single dataset.
+
+```{r libraries, message=FALSE, warning=FALSE}
+# Load libraries
 library(readr)
 library(ggplot2)
 library(corrplot)
 library(ppcor)
 library(RColorBrewer)
 library(mvoutlier)
-
-r2multv<-function(x){
-r2s=1-1/(diag(solve(cov(x)))*diag(cov(x)))
-r2s
-}
 ```
 
-```{r load, message=FALSE, warning=FALSE, echo=FALSE}
+```{r load_partial, message=FALSE, warning=FALSE}
+# Load individual datasets
+white <- read_delim("../../data/raw/winequality-white.csv",";", escape_double = FALSE, trim_ws = TRUE)
+red <- read_delim("../../data/raw/winequality-red.csv",";", escape_double = FALSE, trim_ws = TRUE)
+```
+
+Let us code 0 for white wines and 1 for red wines and set the name of the columns.
+```{r preparation}
+# Create a new column, where 0 indicates white wine and 1 red wine.
+white$type = 0
+red$type = 1
+
+# Combine both datasets.
+df <- rbind(white, red)
+
+# Rename columns.
+colnames(df) <- c("fixed_acidity", "volatile_acidity", "citric_acid", "residual_sugar", 
+                     "chlorides", "free_sulfur_dioxide", "total_sulfur_dioxide", "density", 
+                     "pH", "sulphates", "alcohol", "quality", "type")
+
+# Quality and type are categorical variables.
+df$quality <- as.factor(df$quality)
+df$type <- as.factor(df$type)
+```
+
+Finally, we remove rows with missing values (in this case just 2 entries) and shuffle the dataset in order to mix the different types of wines.
+
+```{r manipulation}
+# Remove missing values.
+df <- df[complete.cases(df), ] # two entries.
+
+# Shuffle dataset.
+df <- df[sample(nrow(df)),]
+
+# Write dataset into csv file.
+write.table(df, file="../../data/processed/wines.csv", sep=";", col.names = TRUE, row.names = FALSE)
+```
+# Analysis of the full dataset
+
+```{r load_complete, message=FALSE, warning=FALSE}
 # Loading the dataset into a dataframe
-df <- read_delim("../../data/processed/wines.csv", 
-  ";", 
-  escape_double = FALSE, 
-  trim_ws = TRUE)
+df <- read_delim("../../data/processed/wines.csv", ";", escape_double = FALSE, trim_ws = TRUE)
 ```
 
-# Analysis of the dataset
-
-The dataset to analyze is composed of the red and white variants of the Portuguese "Vinho verde" wine. In total, there are 6495 different instances of wines, where 4898 are white wine and 1597 red wine. On the other hand, the dataset has 12 variables based on physicochemical tests on different wines plus two categorical variables, one for grading the wine quality by experts between 0 (very bad) and 10 (very excellent) and another binary variable, 0 = white wine and 1 = red wine.
-
-The following Table \ref{table:variables} summarizes the distribution of the quantitative variables, highlighting their minimum, maximum, mean and standard deviation values.
+The following table summarizes the distribution of the quantitative variables, highlighting their minimum, maximum, mean and standard deviation values. 
 
 
-```{r echo=FALSE, include=FALSE}
+```{r}
 summary(df)
+```
 
+## Distribution of target variables
+
+### Type
+
+As we have already seen, the distribution of the `type` of wines is considerably unbalanced, since the 75\% of the observations are white wines, and the other 25\% are red wines. One of the goals of this project will be classifying if a new wine is red or white according to its attributes.
+
+```{r barplot_type, fig.align="center", fig.width=6, fig.height=4}
 type.0 = subset(df, type==0)
 type.1 = subset(df, type==1)
 type.0$type <- 'white'
 type.1$type <- 'red'
 types <- rbind(type.0, type.1)
 types$type = as.factor(types$type)
-```
 
-\begin{table}[h]
-\centering
-\begin{tabular}{|l|c|c|c|c|}
-\hline
- & \textbf{min} & \textbf{max} & \textbf{mean} & \textbf{SD} \\ \hline
-\textbf{fixed\_acidity} & 3,800 & 15,900 & 7,215 & 1.296588 \\ \hline
-\textbf{volatile\_acidity} & 0,0800 & 1,5800 & 0,3396 & 0.164583 \\ \hline
-\textbf{citric\_acid} & 0,0 & 1,6600 & 0,3187 & 0.1452326 \\ \hline
-\textbf{residual\_sugar} & 0,600 & 65,800 & 5,444 & 4.758494 \\ \hline
-\textbf{chlorides} & 0,00900 & 0,61100 & 0,05602 & 0.03503299 \\ \hline
-\textbf{free\_sulfur\_dioxide} & 1,00 & 289,00 & 30,52 & 17.74849 \\ \hline
-\textbf{total\_sulfur\_dioxide} & 6,0 & 440,0 & 115,8 & 56.52657 \\ \hline
-\textbf{density} & 0,9871 & 1,0390 & 0,9947 & 0.002999095 \\ \hline
-\textbf{pH} & 2,720 & 4,010 & 3,219 & 0.1608116 \\ \hline
-\textbf{sulphates} & 0,2200 & 2,00 & 0,5313 & 0.148822 \\ \hline
-\textbf{alcohol} & 8,00 & 14,90 & 10,49 & 1.192768 \\ \hline
-\end{tabular}%
-\caption{Summary distribution of the quantitatives variables.}
-\label{table:variables}
-\end{table}
-
-## Distribution of target variables
-
-### Type
-
-As we have already seen, the distribution of the `type` of wines is considerably unbalanced, since the 75\% of the observations are white wines, and the other 25\% are red wines.
-
-```{r barplot, echo=FALSE,  fig.align="center", fig.width=4, fig.height=2, fig.cap="Distribution of wines according to `type`"}
 ggplot(types, aes(type, ..count..)) + geom_bar(aes(fill=type)) + scale_fill_manual(values=c("red","white")) +
   theme(panel.background = element_rect(fill = 'grey', colour = 'black'), plot.title= element_text(hjust = 0.5))
 ```
 
 ### Quality
 
-The `quality` is actually a categorical variable, as we can see in the following histogram. However, we will treat it as a continuous variable within the regression modeling.
+The `quality` is actually a categorical variable, as we can see in the following histogram. However, we will treat it as a continuous variable within the regression modeling to predict the quality of a new wine.
 
-```{r echo=FALSE, message=FALSE, warning=FALSE, fig.width=4, fig.height=2, fig.cap='Histogram of wines quality: red vs. white'}
-ggplot(types, aes(quality))  + geom_histogram(aes(fill=type), bins=6) +  scale_fill_manual(values=c("red","white")) + ylab("Wine samples")+xlab("Quality") + facet_grid(. ~ type)  +
+```{r barplot_quality, message=FALSE, warning=FALSE, fig.width=6, fig.height=4, fig.align="center"}
+ggplot(types, aes(quality))  + geom_histogram(aes(fill=type), bins=6) + 
+  scale_fill_manual(values=c("red","white")) + ylab("Wine samples") + xlab("Quality") + facet_grid(. ~ type) +
   theme(panel.background = element_rect(fill = 'grey', colour = 'black'), plot.title= element_text(hjust = 0.5))
 ```
 
 ## Correlation analysis
 
-Let's now study the linear relationships between wine quantitative variables. The variables to be inspected are the quantitative attributes `fixed_acidity`, `volatile_acidity`, `citic_acid`, `residual_sugar`, `chlorides`, `free_sulfur_dioxide`, `total_sulfur_dioxide`, `density`, `pH`, `sulphates` and `alcohol`. 
+Let us now study the linear relationships between wine quantitative variables. The variables to be inspected are the quantitative attributes `fixed_acidity`, `volatile_acidity`, `citric_acid`, `residual_sugar`, `chlorides`, `free_sulfur_dioxide`, `total_sulfur_dioxide`, `density`, `pH`, `sulphates` and `alcohol`. We have decided to maintain these 11 variables and do not try to reduce them using a PCA analysis because we are interested in the original meaning and interpretation.. 
 
-```{r echo=FALSE, fig.width=6, fig.height=4, fig.cap='Matrix of pairwise correlations'}
-
-r<-cor(df[,c(1,2,3,4,5,6,7,8,9,10,11)])
-partial.corr <- pcor(df[,c(1,2,3,4,5,6,7,8,9,10,11)])$estimate
-
+```{r corrplot, fig.width=8, fig.height=6, fig.align="center"}
+r <- cor(df[,1:11])
+partial.corr <- pcor(df[,1:11])$estimate
 corrplot(r, method="ellipse")
 ```
 
 As we can see, the linear relations between variables are weak (the tonality of the colors is, in general, soft). We can only assure that `free_sulfur_dioxide` obviously is positive related with the `total_sulfur_dioxide`. Also the `alcohol` has negative effects on the `density` of the wines. To conclude, it is interesting to mention that the `sulphates` does not seem linearly related with any of the other variables. 
 
 ## Coefficients of determination
-The coefficients of determination can also give us a good insight into linear relationships within the
-data. As the Table 2 below displays, important linear relations are present in this set. Specifically, `density`and `residual_sugar` re the most linearly explained by the other variables. Slightly less influenced, but still scoring high, are `fixed_acidity` and `alcohol`.
+The coefficients of determination can also give us a good insight into linear relationships within the data. As Table \ref{table:determination} below displays, important linear relations are present in this set. Specifically, `density` and `residual_sugar` are the most linearly explained by the other variables. Slightly less influenced, but still scoring high, are `fixed_acidity` and `alcohol`.
 
-
-```{r echo=FALSE, include=FALSE}
-r2multv(df[,c(1,2,3,4,5,6,7,8,9,10,11)])
-```
-
-\begin{table}[h]
-\centering
-\resizebox{\textwidth}{!}{%
-\begin{tabular}{@{}lccccccccccc@{}}
-\toprule
- & \textbf{fixed\_acidity} & \textbf{volatile\_acidity} & \textbf{citic\_acid} & \textbf{residual\_sugar} & \textbf{chlorides} & \textbf{free\_sulfur\_dioxide} & \textbf{total\_sulfur\_dioxide} & \textbf{density} & \textbf{pH} & \textbf{sulphates} & \textbf{alcohol} \\ \midrule
-\textbf{R-squared} & 0.7957831 & 0.4866891 & 0.3776351 & 0.8616690 & 0.3870994 & 0.5324288 & 0.6598145 & 0.9371628 & 0.6058479 & 0.3513432 & 0.7908480 \\ \bottomrule
-\end{tabular}%
+```{r coeff_determination}
+r2multv<-function(x){
+  r2s=1-1/(diag(solve(cov(x)))*diag(cov(x)))
+  r2s
 }
-\caption{Coefficient of determination for each of the analyzed variables.}
-\label{my-label}
-\end{table}
 
-As the Table below displays, important linear relations are present in this set. Specifically,  density and residual_sugar a
-
+r2multv(df[,1:11])
+```
 
 ## Effective dependence coefficient of the R matrix
-```{r echo=FALSE, include=FALSE}
-1-det(cor(df[,c(1,2,3,4,5,6,7,8,9,10,11)]))^(1/11)
+```{r effective_dependence}
+1-det(cor(df[,1:11]))^(1/11)
 ```
 Until this point, our analysis shows weak linear relations in this dataset. Further proof of this fact can be found in the effective dependence coefficient of the R matrix: D(R) = 0.4052199. This means that, altogether, linear dependences explain only 40% of the variability of the data. Hence, the linear regression model will probably not perform well in this dataset.
-
-
-
 
