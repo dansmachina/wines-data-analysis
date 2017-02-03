@@ -23,9 +23,9 @@ df <- read_delim("../../data/processed/wines.csv",
   trim_ws = TRUE)
 
 # Train and test dataset, split 80%.
-split = nrow(df)*0.8
-train = df[1:split,]
-test = df[split:nrow(df),]
+split <- nrow(df)*0.8
+train <- df[1:split,]
+test <- df[split:nrow(df),]
 ```
 
 In this case, the test dataset consists of the 20% of the dataset (1300 observations).
@@ -33,18 +33,19 @@ In this case, the test dataset consists of the 20% of the dataset (1300 observat
 Logistic Regression Model
 =========================
 
-The equivalent linear regression model in classification is the logistic regression model. This model needs to specify a function such that p(y=0|X) and p(y=1|X) are both greater than 0 and sum 1. The logistic function has such properties, definining the following model: ![](https://latex.codecogs.com/gif.latex?p%28y%7CX%2C%5Cbeta%29%20%3D%20%5Cfrac%7Be%5E%7B%5Cbeta%20X%7D%7D%7B1+e%5E%7B%5Cbeta%20X%7D%7D)
+The equivalent linear regression model in classification is the logistic regression model. This model needs to specify a function such that p(y=0|X) and p(y=1|X) are both greater than 0 and sum 1. The logistic function has such properties, definining the following model:
 
+<!-- ![](https://latex.codecogs.com/gif.latex?p%28y%7CX%2C%5Cbeta%29%20%3D%20%5Cfrac%7Be%5E%7B%5Cbeta%20X%7D%7D%7B1&plus;e%5E%7B%5Cbeta%20X%7D%7D) -->
 If *β*<sub>*i*</sub> &gt; 0 then increasing one unit in *x*<sub>*i*</sub> will increase the probability of a success. If *β*<sub>*i*</sub> &lt; 0, then the probabilty of success decrease when increasing *x*<sub>*i*</sub>. When *β*<sub>*i*</sub> = 0 , *e*<sup>0</sup> = 1, so the odds do not change with *x*<sub>*i*</sub>.
 
 Full model
 ----------
 
-We start by defining a logistic regression model with all the 11 attributes as the predictors. We do not use the `quality`, used in regression, and neither the `type`, used as the target variable:
+We start by defining a logistic regression model with all the 11 attributes as the predictors. We do not use the `quality`, used in regression, and neither the `type`, used as the target variable *y*:
 
 ``` r
 # Logistic regression model with all the variables.
-log.full=glm(type~fixed_acidity+volatile_acidity
+log.full <- glm(type~fixed_acidity+volatile_acidity
              +citric_acid+residual_sugar+chlorides
              +free_sulfur_dioxide+total_sulfur_dioxide+density
              +pH+sulphates+alcohol, data=train, family=binomial)
@@ -90,7 +91,7 @@ At first sight, each of the coeffiecient has a marginal test which attempts the 
 
 ``` r
 # Logistic regression model with all the variables.
-log.F=glm(type~fixed_acidity+volatile_acidity
+log.F <- glm(type~fixed_acidity+volatile_acidity
              +residual_sugar+chlorides
              +free_sulfur_dioxide+total_sulfur_dioxide+density
              +pH+alcohol, data=train, family=binomial)
@@ -130,7 +131,7 @@ summary(log.F)
     ## 
     ## Number of Fisher Scoring iterations: 11
 
-All the marginal tests are now significantly small and the overall fit of the model is high enough (*p* = 1), so we do not have evidence to reject the model in favour of the simple constant model.
+All the marginal tests are now significantly small and the overall fit of the model is high enough (*p* = 1) testing against a Chi-Squared Distribution (pchisq), so we do not have evidence to reject the model in favor of the simple constant model.
 
 ``` r
 pchisq(log.F$deviance, log.F$df.residual, lower=F)
@@ -146,24 +147,27 @@ We will define the following function to validate the correctness of the model. 
 ``` r
 accuracy <- function(model, train, test){
   # Train error
-  train_prob=model$fitted
-  train_prob=ifelse(train_prob>0.5,1,0)
-  d_train = table(train_prob, train$type)
+  train_prob <- model$fitted
+  train_prob <- ifelse(train_prob>0.5,1,0)
+  d_train <- table(train_prob, train$type)
   
   # Test error
-  test_prob = predict(model, newdata = test, type = "response")
-  test_prob = ifelse(test_prob>0.5,1,0)
-  d_test = table(test_prob, test$type)
+  test_prob <- predict(model, newdata = test, type = "response")
+  test_prob <- ifelse(test_prob>0.5,1,0)
+  d_test <- table(test_prob, test$type)
   
-  train_accuracy = sum(diag(d_train))/sum(d_train)
-  test_accuracy = sum(diag(d_test))/sum(d_test)
+  train_accuracy <- sum(diag(d_train))/sum(d_train)
+  test_accuracy <- sum(diag(d_test))/sum(d_test)
   
   return(list("train" = train_accuracy, "test" = test_accuracy))
 }
 ```
 
+<!-- ![](https://latex.codecogs.com/gif.latex?accuracy%20%3D%20%5Cfrac%7BTP&plus;TN%7D%7BTP&plus;TN&plus;FP&plus;FN%7D) -->
+Hence, with the full model we obtain an accuracy of 99% in both train and test dataset. This can be explained by the fact that the `type` of a wine is clearly defined by a combination of its chemical properties, as expected.
+
 ``` r
-log.F.error = accuracy(log.F, train, test)
+log.F.error <- accuracy(log.F, train, test)
 log.F.error$train
 ```
 
@@ -175,17 +179,15 @@ log.F.error$test
 
     ## [1] 0.9953846
 
-Hence, with the full model we obtain an accuracy of 99% in both train and test dataset. This can be explained by the fact that the `type` of a wine is clearly defined by a combination of its chemical properties, as expected.
-
 Simpler Model
 -------------
 
 Though we obtain a satisfactory accuracy using almost all the variables of the dataset, we would like to find out a simpler model, where just a few attributes were used. This would lead to a more understandable model, easy to interpret and efficient. For instance, we could agree that an optimal model is the one which provides, at least, a 95% of correct classification.
 
-Let us start with the simplest model: the constant model. Since we know that the classes are a bit unbalanced, let us start with the model which sets all the labels to 1.
+Let us start with the simplest model. Since we know that the classes are a bit unbalanced, let us start with the model which sets all the labels to 1.
 
 ``` r
-log.B=glm(type~1, data=train, family=binomial)
+log.B <- glm(type~1, data=train, family=binomial)
 accuracy(log.B, train, test)
 ```
 
@@ -197,7 +199,7 @@ accuracy(log.B, train, test)
 
 A bit more than 75% of accuracy just by guessing that all the wines will be red. However, we are not using the chemical information. Let us now include one of the variables to the logistic model. Which one? The one which decreases the most the AIC. The AIC is a measure of the quality of different models, relative to each of the other models. Ideal for model selection.
 
-The function `step` does this task for us: it chooses a model by AIC in a stepwise algorithm. We would use it in the forward direction: tt starts by the simplest constant model, and it tries to achieve the best model up to the full model, previously defined. Since we will go step by step, we will set the number of `steps` manually, to see what happens in each level.
+The function `step` in R does this task for us: it chooses a model by AIC in a stepwise algorithm. We would use it in the forward direction: it starts by the simplest constant model, and it tries to achieve the best model up to the full model, previously defined. Since we will go step by step, we will set the number of `steps` manually, to see what happens in each level.
 
 ``` r
 #Stepwise algorithm
@@ -237,7 +239,7 @@ step(log.B, scope=list(upper=log.F), direction="forward", step=1)
 Looking at the output, we observe that the best attribute to build a logistic regression with just a single variable is the `total_sulfur_dioxide`. The accuracy of the logistic regression variable for both train and test datasets is 92%! So finally, `type` is almost a matter of sulfur in the liquid. This is, nevertheless, not a surprise, since the most correlated variable with respect to the `type` is also this one:
 
 ``` r
-log.1=glm(type~total_sulfur_dioxide, data=train, family=binomial)
+log.1 <- glm(type~total_sulfur_dioxide, data=train, family=binomial)
 accuracy(log.1, train, test)
 ```
 
@@ -266,7 +268,9 @@ cor(df, df$type)
     ## quality              -0.11889034
     ## type                  1.00000000
 
-Let us include one more variable and see what happens:
+### Two variables model (95% accuracy)
+
+Let us include one more variable to the last model and see what happens:
 
 ``` r
 #Stepwise algorithm
@@ -305,7 +309,7 @@ step(log.1, scope=list(upper=log.F), direction="forward", step=1)
 The AIC decays the most with the inclusion of `density`, reaching an accuracy of 95%. Using just two variables of the dataset, we are just wrong in 58 classifications (21 should have been red, and 37 white) up to a total of 1300 observations.
 
 ``` r
-log.2=glm(type~total_sulfur_dioxide+density, data=train, family=binomial)
+log.2 <- glm(type~total_sulfur_dioxide+density, data=train, family=binomial)
 accuracy(log.2, train, test)
 ```
 
@@ -315,27 +319,89 @@ accuracy(log.2, train, test)
     ## $test
     ## [1] 0.9615385
 
+The odds can be interpreted such that the `density` contributes to the probability of getting a red wine (success) while the `total_sulphur_dioxide` increases the probability of being classified as a whine type, controlling for the other variable.
+
+``` r
+summary(log.2)
+```
+
+    ## 
+    ## Call:
+    ## glm(formula = type ~ total_sulfur_dioxide + density, family = binomial, 
+    ##     data = train)
+    ## 
+    ## Deviance Residuals: 
+    ##     Min       1Q   Median       3Q      Max  
+    ## -7.1282  -0.1863  -0.0646  -0.0035   5.7485  
+    ## 
+    ## Coefficients:
+    ##                        Estimate Std. Error z value Pr(>|z|)    
+    ## (Intercept)          -7.057e+02  3.212e+01  -21.97   <2e-16 ***
+    ## total_sulfur_dioxide -7.118e-02  2.461e-03  -28.93   <2e-16 ***
+    ## density               7.147e+02  3.238e+01   22.07   <2e-16 ***
+    ## ---
+    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+    ## 
+    ## (Dispersion parameter for binomial family taken to be 1)
+    ## 
+    ##     Null deviance: 5808.4  on 5195  degrees of freedom
+    ## Residual deviance: 1392.8  on 5193  degrees of freedom
+    ## AIC: 1398.8
+    ## 
+    ## Number of Fisher Scoring iterations: 10
+
 We stop here, since the addition of more variables does not significantly increase the accuracy of the model. The following plot summarises the accuracy of the logistic model with respect the number of variables included in the model, following the stepwise algorithm.
 
-<img src="logistic-regression_files/figure-markdown_github/model_comparison-1.png" alt="Accuracy vs. number of variables."  />
-<p class="caption">
-Accuracy vs. number of variables.
-</p>
+<img src="logistic-regression_files/figure-markdown_github/model_comparison-1.png" style="display: block; margin: auto;" />
 
-We can detect in Figure that using just 5 variables in the logistic regression mode we achieve the same accuracy (99%) than using all the 9 variables from the full model.
+### Five variables model (99% accuracy)
+
+We can detect in the previous figure that using just 5 variables in the logistic regression mode we achieve the same accuracy (99%) than using all the 9 variables from the full model, getting this final model:
+
+``` r
+log.3 <- glm(type~total_sulfur_dioxide+density+residual_sugar+alcohol+volatile_acidity, data=train, family=binomial)
+summary(log.3)
+```
+
+    ## 
+    ## Call:
+    ## glm(formula = type ~ total_sulfur_dioxide + density + residual_sugar + 
+    ##     alcohol + volatile_acidity, family = binomial, data = train)
+    ## 
+    ## Deviance Residuals: 
+    ##     Min       1Q   Median       3Q      Max  
+    ## -6.7972  -0.0572  -0.0178  -0.0011   5.2619  
+    ## 
+    ## Coefficients:
+    ##                        Estimate Std. Error z value Pr(>|z|)    
+    ## (Intercept)          -1.766e+03  1.055e+02 -16.747   <2e-16 ***
+    ## total_sulfur_dioxide -4.161e-02  3.733e-03 -11.147   <2e-16 ***
+    ## density               1.760e+03  1.047e+02  16.807   <2e-16 ***
+    ## residual_sugar       -9.225e-01  8.131e-02 -11.345   <2e-16 ***
+    ## alcohol               1.798e+00  1.841e-01   9.771   <2e-16 ***
+    ## volatile_acidity      7.631e+00  8.223e-01   9.281   <2e-16 ***
+    ## ---
+    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+    ## 
+    ## (Dispersion parameter for binomial family taken to be 1)
+    ## 
+    ##     Null deviance: 5808.37  on 5195  degrees of freedom
+    ## Residual deviance:  437.68  on 5190  degrees of freedom
+    ## AIC: 449.68
+    ## 
+    ## Number of Fisher Scoring iterations: 9
+
+Both `total_sulphur_dioxide` and `residual_sugar` decreases the odds of red wine. The probability of being a red wine is less than the probability of being a white whine if you have high values of these two variables. On the other hand, `density`, `alcohol` and `volatile_acidity` increases the odds of being red type. For instance, when `density` is increased by one unit and all other variables are held constant the odds of *y* = 1 are multiplied by *e*<sup>3</sup>.
 
 Discussion
 ==========
 
 After our analysis, we have seen that two different approaches are possible in order to solve our classification problem, introduced at the beginning of this document:
 
--   <b>Best classification</b>: In this case, we would like to get the best accuracy as possible. We do not worry in terms of interpretation, but we are looking for the model with less number of parameters that reaches the best accuracy. The model (6) has a 99% of success using 5 of the original variables.
+-   <b>Best classification</b>: In this case, we would like to get the best accuracy as possible. We do not worry in terms of interpretation, but we are looking for the model with less number of parameters that reaches the best accuracy. TUsing 5 of the original variables we achieve a 99% of succes.
 
-\*<b>Simplest explanation</b>: We are interesting in understanding the data and interpret the parameters of the classification predictors as straightforward as possible, imposing a minimum of accuracy. In our case, the model (5) reaches a 95% accuracy using just 2 variables, which is very useful to easily describe the model. For instance, we can plot these two variables in the plane:
+-   <b>Simplest explanation</b>: We are interesting in understanding the data and interpret the parameters of the classification predictors as straightforward as possible, imposing a minimum of accuracy. In our case, using just 2 variables we have a 95% accuracy, which is very useful to easily describe the model. For instance, we can plot these two variables in the plane:
 
-<img src="logistic-regression_files/figure-markdown_github/two_variables_plot-1.png" alt="Total SO2 vs. density."  />
-<p class="caption">
-Total SO2 vs. density.
-</p>
+<img src="logistic-regression_files/figure-markdown_github/two_variables_plot-1.png" style="display: block; margin: auto;" />
 
 This plot shows the variables `density` and `total_sulphur_dioxide` but colored by type. As we can see, it is clear that we have an almost perfect clusters between red and white wines. That is why we are having such a great 95% accuracy in our simpler model.
