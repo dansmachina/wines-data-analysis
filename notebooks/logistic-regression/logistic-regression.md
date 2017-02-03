@@ -16,7 +16,13 @@ Loading the data
 The data science pipeline often needs to split the original dataset into two smaller pieces: the train and test datasets. If we only evaluate our models in the same dataset, the results will be overestimated (aka overfitting). To provide honest assesments of the performance of the predictive models, we will need to validate the models using a test dataset, a partition that has not been used to build the models in order to avoid bias.
 
 ``` r
-# Loading the dataset into a dataframe
+# Load libraries
+library(readr)
+library(ggplot2)
+```
+
+``` r
+# Load the dataset into a dataframe
 df <- read_delim("../../data/processed/wines.csv", 
   ";", 
   escape_double = FALSE, 
