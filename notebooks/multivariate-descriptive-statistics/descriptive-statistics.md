@@ -54,6 +54,7 @@ Finally, we remove rows with missing values (in this case just 2 entries) and sh
 df <- df[complete.cases(df), ] # two entries.
 
 # Shuffle dataset.
+set.seed(111)
 df <- df[sample(nrow(df)),]
 
 # Write dataset into csv file.
