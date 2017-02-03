@@ -3,6 +3,7 @@
 
 ### R ###
 # History files
+.Rmd
 .Rhistory
 .Rapp.history
 
