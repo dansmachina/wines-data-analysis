@@ -35,7 +35,8 @@ Logistic Regression Model
 
 The equivalent linear regression model in classification is the logistic regression model. This model needs to specify a function such that p(y=0|X) and p(y=1|X) are both greater than 0 and sum 1. The logistic function has such properties, definining the following model:
 
-<!-- ![](https://latex.codecogs.com/gif.latex?p%28y%7CX%2C%5Cbeta%29%20%3D%20%5Cfrac%7Be%5E%7B%5Cbeta%20X%7D%7D%7B1&plus;e%5E%7B%5Cbeta%20X%7D%7D) -->
+![](https://latex.codecogs.com/gif.latex?p%28y%7CX%2C%5Cbeta%29%20%3D%20%5Cfrac%7Be%5E%7B%5Cbeta%20X%7D%7D%7B1+e%5E%7B%5Cbeta%20X%7D%7D)
+
 If *β*<sub>*i*</sub> &gt; 0 then increasing one unit in *x*<sub>*i*</sub> will increase the probability of a success. If *β*<sub>*i*</sub> &lt; 0, then the probabilty of success decrease when increasing *x*<sub>*i*</sub>. When *β*<sub>*i*</sub> = 0 , *e*<sup>0</sup> = 1, so the odds do not change with *x*<sub>*i*</sub>.
 
 Full model
@@ -163,7 +164,8 @@ accuracy <- function(model, train, test){
 }
 ```
 
-<!-- ![](https://latex.codecogs.com/gif.latex?accuracy%20%3D%20%5Cfrac%7BTP&plus;TN%7D%7BTP&plus;TN&plus;FP&plus;FN%7D) -->
+![](https://latex.codecogs.com/gif.latex?accuracy%20%3D%20%5Cfrac%7BTP+TN%7D%7BTP+TN+FP+FN%7D)
+
 Hence, with the full model we obtain an accuracy of 99% in both train and test dataset. This can be explained by the fact that the `type` of a wine is clearly defined by a combination of its chemical properties, as expected.
 
 ``` r
