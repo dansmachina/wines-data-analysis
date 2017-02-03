@@ -1,6 +1,9 @@
 
 # Created by https://www.gitignore.io/api/r,macos,windows,linux
 
+### Personal ###
+report/
+
 ### R ###
 # History files
 .Rmd
