@@ -6,7 +6,7 @@ report/
 
 ### R ###
 # History files
-.Rmd
+*.Rmd
 .Rhistory
 .Rapp.history
 
