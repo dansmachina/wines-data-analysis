@@ -6,23 +6,23 @@ Installation
 ----------- 
 Dependencies:
 ````
-library(readr)
-library(ggplot2)
-ibrary(corrplot)
-library(ppcor)
-library(RColorBrewer)
-library(mvoutlier)
-library(dplyr)
-library(tseries)
-library(lmtest)
+install.packages(readr)
+install.packages(ggplot2)
+install.packages(corrplot)
+install.packages(ppcor)
+install.packages(RColorBrewer)
+install.packages(mvoutlier)
+install.packages(dplyr)
+install.packages(tseries)
+install.packages(lmtest)
 ````
 
 Statistical Learning models
 ----------- 
 We have applied different versions of statistical learning models in order to solve both classification and regression problems:
 
-* [Logistic Regression](https://stat.ethz.ch/R-manual/R-patched/library/stats/html/glm.html): the function <i>glm()</i> fits generalized linear models, concretely a logistic regression model when the family is binomial. We propose two different approaches depending on the aim of the study: a) best interpretation and b) best classification.
+* [Logistic Regression](https://stat.ethz.ch/R-manual/R-patched/install.packages/stats/html/glm.html): the function <i>glm()</i> fits generalized linear models, concretely a logistic regression model when the family is binomial. We propose two different approaches depending on the aim of the study: a) best interpretation and b) best classification.
 
-* [Linear Regression](https://stat.ethz.ch/R-manual/R-devel/library/stats/html/lm.html): the function <i>lm()</i> is used to fit linear models. We propose two different linear regression model: a) one with the original variables and b) a new categorical variable according to the sweetness classification.
+* [Linear Regression](https://stat.ethz.ch/R-manual/R-devel/install.packages/stats/html/lm.html): the function <i>lm()</i> is used to fit linear models. We propose two different linear regression model: a) one with the original variables and b) a new categorical variable according to the sweetness classification.
 
 
