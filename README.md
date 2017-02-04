@@ -1,4 +1,4 @@
-# Wines quality and classification
+# wines-data-analysis: Wines quality and classification
 
 The dataset to analyze is composed of the red and white variants of the Portuguese "Vinho verde" wine. In total, there are 6495 different instances of wines, where 4898 are white wine and 1597 red wine. On the other hand, the dataset has 12 variables based on physicochemical tests on different wines plus two categorical variables, one for grading the wine quality by experts between 0 (very bad) and 10 (very excellent) and another binary variable, 0 = white wine and 1 = red wine. The goal of this project is a) to predict the quality of a wine and b) to classify whether a new wine is red or white, given its attributes.
 
